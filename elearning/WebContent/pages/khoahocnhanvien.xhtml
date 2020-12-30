@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" xmlns:b="http://bootsfaces.net/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:h="http://java.sun.com/jsf/html" template="/pages/home.xhtml">
+
+	<ui:define name="content">
+		<style>
+.ui-dialog {
+	overflow: scroll !important;
+	max-height: 100% !important;
+}
+
+.sldapan label {
+	width: 90%;
+	margin-right: 0px !important;
+}
+
+.sldapan {
+	width: 100%;
+	margin: 0px;
+}
+
+.sldapan td {
+	padding: 0px;
+	text-align: left;
+}
+
+.lnumber {
+	background: #009688;
+	padding: 5px 10px;
+	color: white;
+	border-radius: 30px;
+	margin-right: 10px;
+}
+
+.lcauhoi {
+	font-size: 1.2em !important;
+	font-weight: bold;
+	color: #009688;
+}
+
+.diemdanhgia {
+	font-size: 1.1em !important;
+	text-decoration: underline !important;
+	color: #0e8bee !important;
+}
+
+.animated .ui-progressbar-value {
+	background-image: url("#{resource['images/pbar-ani.gif']}");
+}
+</style>
+		<script type="text/javascript">
+    //<![CDATA[
+    //]]>
+</script>
+		<p:growl id="growlCourse" showDetail="true" sticky="false" />
+		<p:tabView id="tv" widgetVar="myTab">
+			<p:tab title="Danh Sách">
+				<h:form id="list">
+					<p:panel
+						style="float:right; border:0px; margin-top:-65px !important;background:none;">
+						<h:panelGrid id="mainGrid" columns="6"
+							style="float:left; margin-bottom:5px">
+							<h:panelGrid columns="2" style="width:100%" cellspacing="10">
+								<p:outputLabel value="Năm" />
+								<p:spinner size="10" value="#{coursePlanBean.yearSearch}"
+									min="2020" max="2050">
+									<p:ajax process="@this" />
+								</p:spinner>
+							</h:panelGrid>
+							<h:panelGrid columns="2" style="width:100%" cellspacing="10">
+								<p:selectOneMenu value="#{coursePlanBean.departmentSelected}"
+									converter="abstractConverter" effect="fade" var="t"
+									style="width:150px;" id="iddeps" filter="true"
+									filterMatchMode="custom" filterFunction="customFilter">
+									<f:selectItems value="#{coursePlanBean.departmentSearchs}"
+										var="item" itemLabel="#{item.name}" itemValue="#{item}" />
+									<p:column>
+										<h:outputText value="#{t.code}" />
+									</p:column>
+									<p:column>
+										<h:outputText value="#{t.showAllNameDepart()}" escape="false" />
+									</p:column>
+								</p:selectOneMenu>
+							</h:panelGrid>
+							<p:commandButton value="Tạo mới" style="float:right;"
+								icon="ui-icon-plus" update="tableid" process="@form"
+								oncomplete="PF('dtlistkpiperson').clearFilters()"
+								actionListener="#{coursePlanBean.create()}" />
+							<p:commandButton value="Tìm" style="float:right;"
+								icon="ui-icon-search" update="tableid" process="@form"
+								oncomplete="PF('dtlistkpiperson').clearFilters()"
+								actionListener="#{coursePlanBean.searchItem()}" />
+							<p:tooltip for="xoact" value="Xoá KPI cá nhân" />
+							<p:commandButton value="Xóa" id="xoact" process="@this"
+								update=":messages" action="#{coursePlanBean.delete()}">
+								<p:confirm header="Xác nhận"
+									message="Bạn có chắc muốn xoá không?" icon="ui-icon-alert" />
+							</p:commandButton>
+						</h:panelGrid>
+					</p:panel>
+					<div style="clear: both" />
+					<p:dataTable value="#{coursePlanBean.plansByDepart}"
+						widgetVar="dtlistkpiperson" styleClass="tableparent"
+						rowKey="#{item.id}" filteredValue="#{coursePlanBean.plansFilter}"
+						selection="#{coursePlanBean.planSelected}" selectionMode="single"
+						id="tableid" var="item">
+						<p:ajax event="rowSelect"
+							listener="#{coursePlanBean.planShowEdit()}" />
+						<p:column headerText="Năm" style="width:30px;text-align:center">
+							<h:outputText value="#{item.year}" />
+						</p:column>
+						<p:column headerText="Nhân viên" style="width:130px"
+							filterBy="#{item.employee_name}"
+							filterFunction="#{abstractCustomFilter.filterByText}">
+							<h:outputText value="#{item.employee_name}" />
+						</p:column>
+						<f:facet name="footer">
+							<div style="clear: both;" />
+						</f:facet>
+					</p:dataTable>
+				</h:form>
+			</p:tab>
+			<p:tab title="Cài đặt">
+				<h:form id="tab2">
+					<div class="ui-g">
+						<div class="ui-g-6">
+							<p:dataTable value="#{coursePositionJobBean.positions}"
+								selectionMode="single"
+								selection="#{coursePositionJobBean.positionSettingSelected}"
+								paginator="true" rowsPerPageTemplate="50,100,150"
+								scrollable="true" paginatorPosition="bottom" tyleClass="mystyle"
+								rows="50" scrollHeight="100%" rowKey="#{item3.id}"
+								id="dtPosition" var="item3" style="width: 100%;height:528px"
+								rowIndexVar="rowIndex"
+								filteredValue="#{coursePositionJobBean.positionsSettingFilter}">
+								<p:ajax event="rowSelect"
+									listener="#{coursePositionJobBean.positionJobSettingOnRowSelected()}"
+									update="tv:tab2:dtCourseSetting" />
+								<f:facet name="header">
+									<p:commandButton value="File excel mẫu" immediate="true"
+										styleClass="btlink"
+										onclick="monitorDownload( showStatus , hideStatus)"
+										actionListener="#{coursePositionJobBean.fileKhoaHocViTriMau()}" />
+									<!-- Upload file excel -->
+									<p:commandButton style="width:130px" styleClass="btnWarning"
+										type="submit" value="Lưu/cập nhật" process="@form"
+										update="growlCourse"
+										action="#{coursePositionJobBean.saveOrUpdate()}"
+										icon="fa fa-save" />
+									<h:form enctype="multipart/form-data">
+										<p:fileUpload
+											fileUploadListener="#{coursePositionJobBean.handleFileUpload}"
+											mode="advanced" dragDropSupport="false" multiple="true"
+											update="messagesh" sizeLimit="10000000"
+											allowTypes="/(\.|\/)(xls|xlsx)$/" label="Chọn tệp tải lên"
+											uploadLabel="Tải lên" cancelLabel="Hủy" process="@form" />
+										<p:growl id="messagesh" showDetail="true" />
+									</h:form>
+									<!-- End upload file excel -->
+								</f:facet>
+								<p:column headerText="STT" style="width:5%;text-align:center;">
+									<h:outputText value="#{rowIndex+1}" />
+								</p:column>
+								<p:column headerText="Mã vị trí"
+									style="width:20%;text-align:center; min-height: 200px!important;">
+									<h:outputText value="#{item3.code}" />
+								</p:column>
+								<p:column filterBy="#{item3.name}"
+									filterFunction="#{abstractCustomFilter.filterByText}"
+									headerText="Vị trí/chức danh" style="width:50%">
+									<h:outputText value="#{item3.name}" />
+								</p:column>
+								<p:column headerText="Phòng ban"
+									style="width:25%;text-align:center">
+									<h:outputText value="#{item3.codeDepart}" />
+								</p:column>
+								<f:facet name="footer">
+									<div style="clear: both;" />
+								</f:facet>
+							</p:dataTable>
+						</div>
+						<div class="ui-g-6">
+							<p:dataTable var="item4"
+								value="#{coursePositionJobBean.allCourse}"
+								rowsPerPageTemplate="25,50,100" scrollable="true"
+								paginator="true" paginatorPosition="bottom"
+								tyleClass="tableformat1" scrollHeight="100%"
+								rowKey="#{item4.id}" id="dtCourseSetting"
+								style="width:100%;height:528px;margin-left:10px"
+								rowIndexVar="rowIndex">
+								<f:facet name="header">
+									<h:outputText value="Khóa học" />
+								</f:facet>
+								<p:column headerText="..." style="width:10%;text-align:center">
+									<p:selectBooleanCheckbox value="#{item4.select}" itemLabel="">
+										<p:ajax process="@this" />
+									</p:selectBooleanCheckbox>
+								</p:column>
+								<p:column headerText="STT" style="width:10%;text-align:center">
+									<h:outputText value="#{rowIndex+1}" />
+								</p:column>
+
+								<p:column headerText="Tên khóa học"
+									style="width:25%;text-align:center">
+									<h:outputText value="#{item4.name}" />
+								</p:column>
+								<p:column headerText="Mô tả"
+									style="width:55%; text-align:center">
+									<h:outputText value="#{item4.description}" />
+								</p:column>
+
+								<f:facet name="footer">
+									<div style="clear: both;" />
+								</f:facet>
+							</p:dataTable>
+						</div>
+					</div>
+				</h:form>
+			</p:tab>
+		</p:tabView>
+		<br />
+
+		<p:dialog widgetVar="wgvCreateCourse"
+			style="max-width: 800px; max-height:800px" modal="true"
+			resizable="false" closeOnEscape="true" header="Thêm khóa học mới"
+			id="dialogCreateSource">
+			<h:form id="formCreateCourse">
+				<h:outputText value="Tên:" style="font-weight:bold" />
+				<p:inputTextarea placeholder="Tên khóa học"
+					value="#{courseBean.courseNew.name}" />
+				<h:outputText value="Giới thiệu:"
+					style="font-weight:bold ;margin-top: 15px" />
+				<p:inputTextarea placeholder="Mô tả chi tiết:"
+					value="#{courseBean.courseNew.description}"
+					style="margin-top:5px;min-height:150px" />
+				<br />
+				<br />
+				<center>
+					<p:commandButton style="align:center;" styleClass="btadd"
+						type="submit" value="Thêm" action="#{courseBean.createCourse()}"
+						icon="ui-icon-plus" oncomplete="PF('wgvCreateCourse').hide();"
+						update="growlCourse" />
+				</center>
+			</h:form>
+		</p:dialog>
+
+	</ui:define>
+</ui:composition>

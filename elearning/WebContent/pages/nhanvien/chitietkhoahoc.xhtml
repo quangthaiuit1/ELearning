@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" xmlns:b="http://bootsfaces.net/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:h="http://java.sun.com/jsf/html" template="/pages/home.xhtml">
+
+	<ui:define name="content">
+		<style>
+.ui-dialog {
+	overflow: scroll !important;
+	max-height: 100% !important;
+}
+
+.sldapan label {
+	width: 90%;
+	margin-right: 0px !important;
+}
+
+.sldapan {
+	width: 100%;
+	margin: 0px;
+}
+
+.sldapan td {
+	padding: 0px;
+	text-align: left;
+}
+
+.lnumber {
+	background: #009688;
+	padding: 5px 10px;
+	color: white;
+	border-radius: 30px;
+	margin-right: 10px;
+}
+
+.lcauhoi {
+	font-size: 1.2em !important;
+	font-weight: bold;
+	color: #009688;
+}
+
+.diemdanhgia {
+	font-size: 1.1em !important;
+	text-decoration: underline !important;
+	color: #0e8bee !important;
+}
+
+.animated .ui-progressbar-value {
+	background-image: url("#{resource['images/pbar-ani.gif']}");
+}
+</style>
+		<script type="text/javascript">
+    //<![CDATA[
+    //]]>
+</script>
+		<p:growl id="growlPlan" showDetail="true" sticky="false" />
+		<h:form id="formdataassign">
+			<p:commandButton ajax="false" value="xem" style="display:none"
+				onclick="this.form.target='_blank'" id="process"
+				action="#{courseEmployeeDetailBean.showPDFData()}" />
+			<p:commandButton ajax="false" value="xem" style="display:none"
+				type="submit" onclick="this.form.target='_blank'" id="report"
+				action="#{kPIPersonBean.printOnly()}" />
+		</h:form>
+		<p:tabView id="tv" widgetVar="myTab">
+			<p:tab title="Kĩ năng">
+				<h:form id="tab1">
+					<div class="ui-g">
+						<p:dataTable var="item1" selectionMode="single"
+							selection="#{courseEmployeeDetailBean.skillSelected}"
+							value="#{courseEmployeeDetailBean.skillsByCourse}"
+							rowsPerPageTemplate="10,25,50" scrollable="true" paginator="true"
+							paginatorPosition="bottom" tyleClass="tableformat1"
+							scrollHeight="100%" rowKey="#{item1.id}" id="dtSkill"
+							style="width:100%;height:328px;margin-bottom:30px"
+							rowIndexVar="rowIndex">
+							<p:ajax event="rowSelect"
+								listener="#{courseEmployeeDetailBean.skillOnRowSelect()}"
+								update="tv:tab2" />
+							<p:column headerText="STT" style="width:5%;text-align:center">
+								<h:outputText value="#{rowIndex+1}" />
+							</p:column>
+
+							<p:column headerText="Nội dung" style="width:25%">
+								<h:outputText value="#{item1.name}" />
+							</p:column>
+							<p:column headerText="Mô tả" style="width:55%; text-align:center">
+								<h:outputText value="#{item1.description}" />
+							</p:column>
+							<p:column headerText="Bài kiểm tra">
+								<p:column headerText="..." style="text-align: center;width: 15%">
+									<p:linkButton outcome="chitietkhoahoc" value="Thực hiện"
+										target="_blank" style="width:100%" styleClass="btsave">
+										<f:param name="id" value="#{item1.id}" />
+									</p:linkButton>
+								</p:column>
+							</p:column>
+							<f:facet name="footer">
+								<div style="clear: both;" />
+							</f:facet>
+						</p:dataTable>
+					</div>
+				</h:form>
+			</p:tab>
+			<p:tab title="Chi tiết">
+				<h:form id="tab2">
+					<div class="ui-g">
+						<p:dataTable var="item2" selectionMode="single"
+							selection="#{courseEmployeeDetailBean.skillDetailSelected}"
+							value="#{courseEmployeeDetailBean.skillDetailsBySkill}"
+							rowsPerPageTemplate="10,25,50" scrollable="true" paginator="true"
+							paginatorPosition="bottom" tyleClass="tableformat1"
+							scrollHeight="100%" rowKey="#{item2.id}" id="dtSkillDetail"
+							style="width:100%;height:328px;margin-bottom:30px"
+							rowIndexVar="rowIndex">
+							<p:ajax event="rowSelect" update="tv:tab3" />
+							<p:column headerText="STT" style="width:5%;text-align:center">
+								<h:outputText value="#{rowIndex+1}" />
+							</p:column>
+
+							<p:column headerText="Nội dung" style="width:25%">
+								<h:outputText value="#{item2.name}" />
+							</p:column>
+							<p:column headerText="Mô tả" style="width:70%; text-align:center">
+								<h:outputText value="#{item2.description}" />
+							</p:column>
+							<f:facet name="footer">
+								<div style="clear: both;" />
+							</f:facet>
+						</p:dataTable>
+					</div>
+				</h:form>
+			</p:tab>
+			<p:tab title="Thông tin">
+				<h:form id="tab3">
+					<h3 style="text-align: center">#{courseEmployeeDetailBean.skillDetailSelected.name}</h3>
+					<h4>Tài liệu</h4>
+					<p:commandLink value="Xem file (PDF)" process="@this"
+						style="font-size: 12px;text-decoration: underline;color: blue;font-style: italic;margin-left:20px"
+						actionListener="#{courseEmployeeDetailBean.processDataAssign()}" />
+
+					<h4>Video</h4>
+					<p:commandLink value="Xem file" process="@this"
+						style="font-size: 12px;text-decoration: underline;color: blue;font-style: italic;margin-left:20px"
+						actionListener="#{courseEmployeeDetailBean.processDataAssign()}" />
+
+					<b:row style="margin-top: 20px">
+						<b:video small-screen="two-thirds" src="#{courseBean.pathVideo}"
+							style="width:100%"
+							tooltip="Video of Hawai provided by Apple (http://a1.phobos.apple.com/us/r1000/000/Features/atv/AutumnResources/videos/b1-1.mov)"
+							tooltip-position="right" onplay="ajax:courseBean.onPlay()"
+							onpause="ajax:courseBean.onPause()"
+							onloadeddata="ajax:courseBean.onLoadeddataNew()"
+							oncanplaythrough="ajax:courseBean.onCanplaythrough()"
+							onseeking="ajax:courseBean.onSeeking()" update="@next">
+						</b:video>
+						<b:inputTextarea value="" small-screen="one-third"
+							tooltip="recorded video AJAX events" style="height:350px" />
+					</b:row>
+				</h:form>
+			</p:tab>
+		</p:tabView>
+		<br />
+
+		<p:dialog widgetVar="wgvCreateCourse"
+			style="max-width: 800px; max-height:800px" modal="true"
+			resizable="false" closeOnEscape="true" header="Thêm khóa học mới"
+			id="dialogCreateSource">
+			<h:form id="formCreateCourse">
+				<h:outputText value="Tên:" style="font-weight:bold" />
+				<p:inputTextarea placeholder="Tên khóa học"
+					value="#{courseBean.courseNew.name}" />
+				<h:outputText value="Giới thiệu:"
+					style="font-weight:bold ;margin-top: 15px" />
+				<p:inputTextarea placeholder="Mô tả chi tiết:"
+					value="#{courseBean.courseNew.description}"
+					style="margin-top:5px;min-height:150px" />
+				<br />
+				<br />
+				<center>
+					<p:commandButton style="align:center;" styleClass="btadd"
+						type="submit" value="Thêm" action="#{courseBean.createCourse()}"
+						icon="ui-icon-plus" oncomplete="PF('wgvCreateCourse').hide();"
+						update="growlPlan" />
+				</center>
+			</h:form>
+		</p:dialog>
+
+	</ui:define>
+</ui:composition>
