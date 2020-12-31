@@ -78,7 +78,7 @@
 									style="width:150px;" id="iddeps" filter="true"
 									filterMatchMode="custom" filterFunction="customFilter">
 									<f:selectItems value="#{coursePlanBean.departmentSearchs}"
-										var="item" itemLabel="#{item.name}" itemValue="#{item}" />
+										var="item2" itemLabel="#{item2.name}" itemValue="#{item2}" />
 									<p:column>
 										<h:outputText value="#{t.code}" />
 									</p:column>
@@ -89,14 +89,14 @@
 							</h:panelGrid>
 							<p:commandButton value="Tạo mới" style="float:right;"
 								icon="ui-icon-plus" update="dtTablePlan,growlPlan"
-								process="@form"
-								oncomplete="PF('dtlistkpiperson').clearFilters()"
+								process="@form" oncomplete="PF('dtlistKeHoach').clearFilters()"
 								actionListener="#{coursePlanBean.create()}" />
 							<p:commandButton value="Tìm" style="float:right;"
 								icon="ui-icon-search" update="dtTablePlan" process="@form"
-								oncomplete="PF('dtlistkpiperson').clearFilters()"
+								oncomplete="PF('dtlistKeHoach').clearFilters()"
 								actionListener="#{coursePlanBean.searchItem()}" />
-							<p:commandButton value="Xóa" id="xoact" process="@this"
+							<p:commandButton value="Xóa" id="xoact"
+								oncomplete="PF('dtlistKeHoach').clearFilters()"
 								update=":messages,dtTablePlan"
 								action="#{coursePlanBean.delete()}">
 								<p:confirm header="Xác nhận"
@@ -106,14 +106,16 @@
 					</p:panel>
 					<div style="clear: both" />
 					<p:dataTable value="#{coursePlanBean.plansByDepart}"
-						widgetVar="dtlistkpiperson" styleClass="tableparent"
+						widgetVar="dtlistKeHoach" styleClass="tableparent"
 						rowKey="#{item.id}" filteredValue="#{coursePlanBean.plansFilter}"
 						selection="#{coursePlanBean.planSelected}" selectionMode="single"
 						id="dtTablePlan" var="item">
 						<p:ajax event="rowSelect" update="tv:tab2, tv:tab3"
 							listener="#{coursePlanBean.planShowEdit()}" />
 						<p:column headerText="..." style="width:5%;text-align:center">
-							<p:selectBooleanCheckbox value="#{item.select}" itemLabel="" />
+							<p:selectBooleanCheckbox value="#{item.select}" itemLabel="">
+								<p:ajax process="@this" />
+							</p:selectBooleanCheckbox>
 						</p:column>
 						<p:column headerText="Năm" style="width:10%;text-align:center">
 							<h:outputText value="#{item.year}" />

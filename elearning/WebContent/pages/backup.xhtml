@@ -1,0 +1,22 @@
+<c:forEach items="#{testBean.qAndAnswers}" var="item">
+	<c:set var="evenCount" value="${evenCount+1}" />
+	<div class="ui-g" style="width: 100%">
+		<p>
+			<h:outputText value="Câu #{evenCount}" style="margin-left: 5px" />
+			: #{item.question.name_question}
+		</p>
+		<br></br>
+	</div>
+	<div class="ui-g" style="width: 100%; margin-left: 10px">
+		<h:panelGrid columns="1" style="margin-bottom:10px;width:70%"
+			cellpadding="5" id="panelGrid1_#{evenCount}">
+			<p:selectOneRadio id="id1_#{evenCount}"
+				value="#{testBean.answersResp[evenCount]}" layout="grid" columns="1"
+				converter="abstractConverter">
+				<f:selectItems value="#{item.answers}" var="a" itemLabel="#{a.name}"
+					itemValue="#{a}" />
+				<p:ajax process="@this" />
+			</p:selectOneRadio>
+		</h:panelGrid>
+	</div>
+</c:forEach>

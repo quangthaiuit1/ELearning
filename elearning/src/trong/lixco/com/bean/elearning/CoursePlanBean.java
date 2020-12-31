@@ -24,11 +24,15 @@ import trong.lixco.com.bean.staticentity.MessageView;
 import trong.lixco.com.ejb.service.elearning.CoursePositionJobService;
 import trong.lixco.com.ejb.service.elearning.CourseService;
 import trong.lixco.com.ejb.service.elearning.PlanDetailService;
+import trong.lixco.com.ejb.service.elearning.PlanDetailSkillService;
 import trong.lixco.com.ejb.service.elearning.PlanService;
+import trong.lixco.com.ejb.service.elearning.SkillService;
 import trong.lixco.com.jpa.entities.Course;
 import trong.lixco.com.jpa.entities.CoursePositionJob;
 import trong.lixco.com.jpa.entities.Plan;
 import trong.lixco.com.jpa.entities.PlanDetail;
+import trong.lixco.com.jpa.entities.PlanDetailSkill;
+import trong.lixco.com.jpa.entities.Skill;
 import trong.lixco.com.servicepublic.EmployeeDTO;
 import trong.lixco.com.servicepublic.EmployeeServicePublic;
 import trong.lixco.com.servicepublic.EmployeeServicePublicProxy;
@@ -63,6 +67,10 @@ public class CoursePlanBean extends AbstractBean<Course> {
 	private CourseService COURSE_SERVICE;
 	@Inject
 	private PlanDetailService PLAN_DETAIL_SERVICE;
+	@Inject
+	private SkillService SKILL_SERVICE;
+	@Inject
+	private PlanDetailSkillService PLAN_DETAIL_SKILL_SERVICE;
 
 	@Override
 	protected void initItem() {
@@ -198,6 +206,7 @@ public class CoursePlanBean extends AbstractBean<Course> {
 			}
 		}
 		MessageView.INFO("Thành công");
+		plansByDepart = new ArrayList<>();
 		plansByDepart = PLAN_SERVICE.findByDepartAndYear(departmentSelected.getCode(), yearSearch);
 	}
 
@@ -212,7 +221,25 @@ public class CoursePlanBean extends AbstractBean<Course> {
 					PlanDetail pdCheck = PLAN_DETAIL_SERVICE.findByCourseAndPlan(coursesByPosition.get(i).getId(),
 							planSelected.getId());
 					if (pdCheck.getId() == null) {
-						PLAN_DETAIL_SERVICE.create(pdNew);
+						PlanDetail p = PLAN_DETAIL_SERVICE.create(pdNew);
+						// neu them chi tiet khoa hoc thanh cong -> them ki nang
+						List<Skill> s = SKILL_SERVICE.findByCourse(p.getCourse().getId());
+						for (int j = 0; j < s.size(); j++) {
+							PlanDetailSkill pds = new PlanDetailSkill(s.get(j), p);
+							pds = PLAN_DETAIL_SKILL_SERVICE.create(pds);
+						}
+					} else {
+						List<Skill> s = SKILL_SERVICE.findByCourse(pdCheck.getCourse().getId());
+						for (int j = 0; j < s.size(); j++) {
+							PlanDetailSkill pds = new PlanDetailSkill(s.get(j), pdCheck);
+							// kiem tra co chua
+							List<PlanDetailSkill> listCheck = PLAN_DETAIL_SKILL_SERVICE
+									.findBySkillAndPlanDetail(s.get(j).getId(), pdCheck.getId());
+							if (listCheck.isEmpty()) {
+								pds = PLAN_DETAIL_SKILL_SERVICE.create(pds);
+							}
+
+						}
 					}
 				} catch (Exception e) {
 					e.printStackTrace();

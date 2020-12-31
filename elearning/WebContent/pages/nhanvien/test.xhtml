@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+<h:head>
+	<title>HỆ THỐNG KHẢO SÁT</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+	<!-- Bootstrap core CSS -->
+	<h:outputStylesheet library="bootstrap"
+		name="web/css/bootstrap.min.css" />
+	<h:outputStylesheet library="bootstrap" name="web/css/style-css.css" />
+	<h:outputStylesheet library="bootstrap" name="web/css/css-search.css" />
+	<h:outputStylesheet name="css/style.css" />
+
+	<!-- Custom styles for this template -->
+	<h:outputStylesheet library="bootstrap"
+		name="web/css/modern-business.css" />
+	<!-- CSS -->
+	<style type="text/css">
+.ui-state-highlight {
+	background: #208eb6 !important;
+	border-color: #208eb6 ! important;
+	color: white;
+}
+
+div#formTest {
+	width: 100%
+}
+</style>
+</h:head>
+<h:body
+	style="background-color: #eee;width: 60%;margin: 0 auto;padding-top: 0px">
+	<p:growl id="growlKhaoSat" showDetail="true" sticky="false" />
+	<div class="ui-g" style="background-color: #15aad3; margin-top: 5px">
+		<div style="" class="ui-g-3">
+			<h:graphicImage library="images" name="logo-lixco.png" height="auto" />
+		</div>
+		<div class="ui-g-9">
+			<h5
+				style="color: white; margin-top: 20px; margin-left: 13%; font-size: 20px;">CÔNG
+				TY CỔ PHẦN BỘT GIẶT LIX</h5>
+		</div>
+	</div>
+	<div class="ui-g" style="background: white; width: 100%">
+		<h:form id="formTest" style="width:100%!important;">
+			<div class="ui-g" style="background: white; width: 100%">
+				<p:dataList value="#{testBean.qAndAnswers}" var="item"
+					type="definition" rowIndexVar="index" style="width:100%">
+					<h:outputText value="Câu #{index + 1}: " style="margin-left:5px" />
+					<h:outputText value="#{item.question.name_question}" />
+					<f:facet name="description">
+						<p:selectOneRadio id="answer#{index + 1}"
+							value="#{testBean.answersResp[index + 1]}" layout="responsive"
+							columns="1" converter="abstractConverter">
+							<f:selectItems value="#{item.answers}" var="answer"
+								itemLabel="#{answer.name}" itemValue="#{answer}">
+							</f:selectItems>
+						</p:selectOneRadio>
+					</f:facet>
+				</p:dataList>
+			</div>
+			<div class="ui-g"
+				style="text-align: center; margin-top: 10px; margin-bottom: 10px">
+				<p:commandButton styleClass="btsave" style=" margin: 0 auto"
+					value="Hoàn thành" update="formTest,growlKhaoSat"
+					icon="fa fa-check" process="formTest"
+					action="#{testBean.submitTest()}" />
+			</div>
+		</h:form>
+	</div>
+	<div style="background-color: #15aad3">
+		<center>
+			<h:outputText
+				style="text-align: center; color: white;margin-bottom:5px;margin-top:5px"
+				value=" Số 3 Đường Số 2, P. Linh Trung, Q. Thủ Đức, TP. HCM."
+				styleClass="fa fa-location-arrow">
+			</h:outputText>
+		</center>
+		<center>
+			<h:outputText
+				style="text-align: center; color: white;margin-bottom:5px"
+				value=" 028 - 38 964 072" styleClass="fa fa-phone-square">
+			</h:outputText>
+		</center>
+	</div>
+</h:body>
+
+</html>

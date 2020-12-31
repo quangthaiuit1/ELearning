@@ -13,7 +13,7 @@ import trong.lixco.com.jpa.entity.AbstractEntity;
 @Entity
 @Table(name = "plan_detail")
 public class PlanDetail extends AbstractEntity {
-	private double avg_score;
+	private double avg_score = 0;
 	@OneToOne
 	private Course course;
 	@OneToOne

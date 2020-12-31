@@ -2,6 +2,7 @@ package trong.lixco.com.bean.elearning;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -87,6 +88,7 @@ public class CourseEmployeeBean extends AbstractBean<Course> {
 				departmentSearchs = DepartmentUtil.sort(departmentSearchs);
 				departmentSelected = departmentSearchs.get(0);
 			}
+			yearSearch = Calendar.getInstance().get(Calendar.YEAR);
 			searchItem();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -173,7 +175,7 @@ public class CourseEmployeeBean extends AbstractBean<Course> {
 						PLAN_SERVICE.create(pNew);
 					}
 				}
-				plansByDepart = PLAN_SERVICE.findByDepart(departmentSelected.getCode());
+				plansByDepart = PLAN_SERVICE.findByDepartAndYear(departmentSelected.getCode(), yearSearch);
 				MessageView.INFO("Thành công");
 			}
 		} catch (Exception e) {

@@ -166,13 +166,14 @@
 								id="endDate" showButtonPanel="true" navigator="true"
 								mask="#{applicationBean.cf.maskDate}" />
 						</p:column>
-						<p:column headerText="Điểm trung bình" style="width:10%;text-align:center">
+						<p:column headerText="Điểm trung bình"
+							style="width:10%;text-align:center">
 							<h:outputText value="#{item5.avg_score}" />
 						</p:column>
 						<p:column headerText="..." style="text-align: center;width: 10%">
 							<p:linkButton outcome="chitietkhoahoc" value="Chi tiết"
 								target="_blank" style="width:90%" styleClass="btsave">
-								<f:param name="id" value="#{item5.course.id}" />
+								<f:param name="pdid" value="#{item5.id}" />
 							</p:linkButton>
 						</p:column>
 						<f:facet name="footer">

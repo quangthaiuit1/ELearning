@@ -231,7 +231,9 @@
 							id="dtSkillDetail"
 							style="width:100%;height:328px;margin-bottom:30px"
 							rowIndexVar="rowIndex">
-							<p:ajax event="rowSelect" update="tv:tab3" />
+							<p:ajax event="rowSelect"
+								listener="#{courseBean.skillDetailOnRowSelect()}"
+								update="tv:tab3" />
 							<f:facet name="header">
 								<p:commandButton style="margin-left: 90%;width:120px"
 									styleClass="btadd" type="submit" value="Thêm"
@@ -309,8 +311,8 @@
 								<p:column headerText="Xóa" width="20">
 									<p:commandButton icon="fa fa-trash" id="btnRemoveQ"
 										type="submit" process="@form" style="color:red"
-										action="#{courseBean.deleteAnswer(item5)}" update="dtQuestion"
-										immediate="true" />
+										action="#{courseBean.deleteQuestion(item4)}"
+										update="dtQuestion,growlCourse" immediate="true" />
 								</p:column>
 							</p:dataTable>
 						</div>
@@ -352,31 +354,32 @@
 				<h:form id="tab3">
 					<h3 style="text-align: center">#{courseBean.skillDetailSelected.name}</h3>
 					<h4>Tài liệu</h4>
+					<p:separator style="width:50%;float:left;margin-top:0px" />
+					<br />
+					<br />
 					<p:commandLink value="Tải lên (PDF)" style="font-size:12px"
 						oncomplete="PF('dialogDataAssign').show();" process="@this" />
 					<p:commandLink value="Xem file (PDF)" process="@this"
 						style="font-size: 12px;text-decoration: underline;color: blue;font-style: italic;margin-left:20px"
 						actionListener="#{courseBean.processDataAssign()}" />
-
-					<h4>Video</h4>
-					<p:commandLink value="Tải lên" style="font-size:12px"
+					<h4 style="margin-top: 30px">Video</h4>
+					<p:separator style="width:50%;float:left;margin-top:0px" />
+					<br />
+					<br />
+					<p:commandLink value="Tải lên (file .mp4)" style="font-size:12px"
 						oncomplete="PF('dialogDataVideo').show();" process="@this" />
 					<p:commandLink value="Xem file" process="@this"
 						style="font-size: 12px;text-decoration: underline;color: blue;font-style: italic;margin-left:20px"
 						actionListener="#{courseBean.processDataAssign()}" />
-
 					<b:row style="margin-top: 20px">
-						<b:video small-screen="two-thirds" src="#{courseBean.pathVideo}"
-							style="width:100%"
-							tooltip="Video of Hawai provided by Apple (http://a1.phobos.apple.com/us/r1000/000/Features/atv/AutumnResources/videos/b1-1.mov)"
-							tooltip-position="right" onplay="ajax:courseBean.onPlay()"
+						<b:video small-screen="two-thirds"
+							src="../resources/videos/#{courseBean.pathVideo}"
+							style="width:100%" onplay="ajax:courseBean.onPlay()"
 							onpause="ajax:courseBean.onPause()"
 							onloadeddata="ajax:courseBean.onLoadeddataNew()"
 							oncanplaythrough="ajax:courseBean.onCanplaythrough()"
-							onseeking="ajax:courseBean.onSeeking()" update="@next">
+							onseeking="ajax:courseBean.onSeeking()">
 						</b:video>
-						<b:inputTextarea value="" small-screen="one-third"
-							tooltip="recorded video AJAX events" style="height:350px" />
 					</b:row>
 				</h:form>
 			</p:tab>
@@ -495,7 +498,10 @@
 				<br />
 				<center>
 					<p:commandButton style="align:center;" styleClass="btadd"
-						type="submit" value="Thêm" icon="ui-icon-plus" />
+						type="submit" value="Thêm" icon="ui-icon-plus"
+						action="#{courseBean.createSkill()}"
+						oncomplete="PF('wgvCreateSkill').hide();"
+						update="tv:formCourse:dtSkill,growlCourse" />
 				</center>
 			</h:form>
 		</p:dialog>
@@ -520,7 +526,7 @@
 						type="submit" value="Thêm"
 						action="#{courseBean.createSkillDetail()}" icon="ui-icon-plus"
 						oncomplete="PF('wgvCreateSkillDetail').hide();"
-						update="tv:tab2:dtSkillDetail,growlCourse" />
+						update="tv:tab2:dtSkillDetail,growlCourse,formCreateSkillDetail" />
 				</center>
 			</h:form>
 

@@ -22,14 +22,18 @@ import trong.lixco.com.account.servicepublics.DepartmentServicePublic;
 import trong.lixco.com.account.servicepublics.Member;
 import trong.lixco.com.account.servicepublics.MemberServicePublic;
 import trong.lixco.com.bean.AbstractBean;
+import trong.lixco.com.bean.staticentity.MessageView;
 import trong.lixco.com.ejb.service.elearning.CourseService;
 import trong.lixco.com.ejb.service.elearning.PlanDetailService;
+import trong.lixco.com.ejb.service.elearning.PlanDetailSkillService;
 import trong.lixco.com.ejb.service.elearning.PlanService;
 import trong.lixco.com.ejb.service.elearning.SkillDetailService;
 import trong.lixco.com.ejb.service.elearning.SkillService;
 import trong.lixco.com.ejb.service.elearning.StoragePathService;
 import trong.lixco.com.jpa.entities.Course;
 import trong.lixco.com.jpa.entities.Plan;
+import trong.lixco.com.jpa.entities.PlanDetail;
+import trong.lixco.com.jpa.entities.PlanDetailSkill;
 import trong.lixco.com.jpa.entities.Skill;
 import trong.lixco.com.jpa.entities.SkillDetail;
 import trong.lixco.com.util.Notify;
@@ -47,10 +51,15 @@ public class CourseEmployeeDetailBean extends AbstractBean<Course> {
 	// Use
 	private List<Course> coursesByEmpl;
 	private Course courseSelected;
-	private List<Skill> skillsByCourse;
-	private Skill skillSelected;
 	private List<SkillDetail> skillDetailsBySkill;
 	private SkillDetail skillDetailSelected;
+	private String pathVideo = "";
+	private List<PlanDetailSkill> pdSkillsByPD; // planDetailSkill by planDetail
+	private PlanDetailSkill pdSkillSelected;
+	private double avgCourse = 0;
+	private long idPlanDetail;
+	private PlanDetail pdPlaying;
+
 	@Inject
 	private CourseService COURSE_SERVICE;
 	@Inject
@@ -59,16 +68,22 @@ public class CourseEmployeeDetailBean extends AbstractBean<Course> {
 	private SkillDetailService SKILL_DETAIL_SERVICE;
 	@Inject
 	private StoragePathService STORAGE_PATH_SERVICE;
+	@Inject
+	private PlanDetailSkillService PlAN_DETAIL_SKILL_SERVICE;
+	@Inject
+	private PlanDetailService PLAN_DETAIL_SERVICE;
 	// end use
 
 	@Override
 	protected void initItem() {
 		try {
 			member = getAccount().getMember();
-			long idCourseSelected = getParamCourseId();
-			if (idCourseSelected != 0) {
-				courseSelected = COURSE_SERVICE.findById(idCourseSelected);
-				skillsByCourse = SKILL_SERVICE.findByCourse(courseSelected.getId());
+			idPlanDetail = getPlanDetailId();
+
+			if (idPlanDetail != 0) {
+				pdPlaying = PLAN_DETAIL_SERVICE.findById(idPlanDetail);
+				avgCourse = pdPlaying.getAvg_score();
+				pdSkillsByPD = PlAN_DETAIL_SKILL_SERVICE.findBySkillAndPlanDetail(0, idPlanDetail);
 			} else {
 				return;
 			}
@@ -77,16 +92,19 @@ public class CourseEmployeeDetailBean extends AbstractBean<Course> {
 		}
 	}
 
-	public long getParamCourseId() {
+	public long getPlanDetailId() {
 		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext()
 				.getRequest();
-		String setofIdTemp = request.getParameter("id");
+		String setofIdTemp = request.getParameter("pdid");
+		if (setofIdTemp.equals("null")) {
+			return 0;
+		}
 		return Long.parseLong(setofIdTemp);
 	}
 
 	public void skillOnRowSelect() {
 		try {
-			skillDetailsBySkill = SKILL_DETAIL_SERVICE.findBySkill(skillSelected.getId());
+			skillDetailsBySkill = SKILL_DETAIL_SERVICE.findBySkill(pdSkillSelected.getSkill().getId());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -106,6 +124,27 @@ public class CourseEmployeeDetailBean extends AbstractBean<Course> {
 		}
 	}
 
+	public void handleAVGCourse() {
+		double totalScore = 0;
+		List<PlanDetailSkill> pdsByPD = PlAN_DETAIL_SKILL_SERVICE.findBySkillAndPlanDetail(0, idPlanDetail);
+		if (!pdsByPD.isEmpty() && pdsByPD != null) {
+			for (PlanDetailSkill p : pdsByPD) {
+				totalScore = totalScore + p.getScore();
+			}
+			avgCourse = totalScore / (double) pdsByPD.size();
+			PlanDetail pd = pdsByPD.get(0).getPlan_detail();
+			pd.setAvg_score(avgCourse);
+			PlanDetail p = PLAN_DETAIL_SERVICE.update(pd);
+			if (p != null && p.getId() != null) {
+				MessageView.INFO("Thành công");
+				return;
+			} else {
+				MessageView.ERROR("Lỗi");
+				return;
+			}
+		}
+	}
+
 	public void saveOrUpdateTab3() {
 
 	}
@@ -114,12 +153,12 @@ public class CourseEmployeeDetailBean extends AbstractBean<Course> {
 
 	}
 
-	public void removeKPIPersonOther() {
+	public void delete() {
 
 	}
 
-	public void delete() {
-
+	public void skillDetailOnRowSelect() {
+		pathVideo = skillDetailSelected.getFile_video();
 	}
 
 	public void showPDFData() throws IOException {
@@ -158,6 +197,32 @@ public class CourseEmployeeDetailBean extends AbstractBean<Course> {
 		}
 	}
 
+	private String events = "";
+
+	public void onPlay() {
+		events = "play" + "\n" + events;
+	}
+
+	public void onPause() {
+		events = "pause" + "\n" + events;
+	}
+
+	public void onSeeking() {
+		events = "seeking" + "\n" + events;
+	}
+
+	public void onCanplaythrough() {
+		events = "can play through" + "\n" + events;
+	}
+
+	public void onLoadeddata() {
+		events = "loaded data" + "\n" + events;
+	}
+
+	public void onLoadeddataNew() {
+		events = "loaded data" + "\n" + events;
+	}
+
 	@Override
 	protected Logger getLogger() {
 		return null;
@@ -179,22 +244,6 @@ public class CourseEmployeeDetailBean extends AbstractBean<Course> {
 		this.courseSelected = courseSelected;
 	}
 
-	public List<Skill> getSkillsByCourse() {
-		return skillsByCourse;
-	}
-
-	public void setSkillsByCourse(List<Skill> skillsByCourse) {
-		this.skillsByCourse = skillsByCourse;
-	}
-
-	public Skill getSkillSelected() {
-		return skillSelected;
-	}
-
-	public void setSkillSelected(Skill skillSelected) {
-		this.skillSelected = skillSelected;
-	}
-
 	public List<SkillDetail> getSkillDetailsBySkill() {
 		return skillDetailsBySkill;
 	}
@@ -211,6 +260,35 @@ public class CourseEmployeeDetailBean extends AbstractBean<Course> {
 		this.skillDetailSelected = skillDetailSelected;
 	}
 
-	// use
+	public String getPathVideo() {
+		return pathVideo;
+	}
 
+	public void setPathVideo(String pathVideo) {
+		this.pathVideo = pathVideo;
+	}
+
+	public List<PlanDetailSkill> getPdSkillsByPD() {
+		return pdSkillsByPD;
+	}
+
+	public void setPdSkillsByPD(List<PlanDetailSkill> pdSkillsByPD) {
+		this.pdSkillsByPD = pdSkillsByPD;
+	}
+
+	public PlanDetailSkill getPdSkillSelected() {
+		return pdSkillSelected;
+	}
+
+	public void setPdSkillSelected(PlanDetailSkill pdSkillSelected) {
+		this.pdSkillSelected = pdSkillSelected;
+	}
+
+	public double getAvgCourse() {
+		return avgCourse;
+	}
+
+	public void setAvgCourse(double avgCourse) {
+		this.avgCourse = avgCourse;
+	}
 }

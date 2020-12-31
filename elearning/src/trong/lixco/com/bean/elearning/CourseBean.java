@@ -84,6 +84,7 @@ public class CourseBean extends AbstractBean<Course> {
 	private Notify notify;
 
 	private String pathVideo = "";
+	private String pathVideoLocal = "";
 
 	@Inject
 	private CourseTypeService COURSE_TYPE_SERVICE;
@@ -102,6 +103,7 @@ public class CourseBean extends AbstractBean<Course> {
 
 	@Override
 	protected void initItem() {
+		// pathVideoLocal = STORAGE_PATH_SERVICE.findByName("file").getPath();
 		allCourseType = COURSE_TYPE_SERVICE.findAll();
 		if (allCourseType == null || allCourseType.isEmpty()) {
 			allCourseType = new ArrayList<>();
@@ -321,6 +323,19 @@ public class CourseBean extends AbstractBean<Course> {
 		}
 	}
 
+	public void deleteQuestion(Question item) {
+		try {
+			QUESTION_SERVICE.delete(item);
+			MessageView.INFO("Thành công");
+			if (skillSelected != null && skillSelected.getId() != null) {
+				questionsBySkill = QUESTION_SERVICE.findBySkill(skillSelected.getId());
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			MessageView.ERROR("Lỗi");
+		}
+	}
+
 	private String nameAssign;
 
 	public void processDataAssign() {
@@ -519,6 +534,7 @@ public class CourseBean extends AbstractBean<Course> {
 					skillDetails = SKILL_DETAIL_SERVICE.findBySkill(skillSelected.getId());
 				}
 				MessageView.INFO("Thành công");
+				skillDetailNew = new SkillDetail();
 				return;
 			}
 			MessageView.INFO("Lỗi");
