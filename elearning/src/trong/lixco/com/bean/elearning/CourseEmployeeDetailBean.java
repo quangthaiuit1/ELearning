@@ -30,12 +30,14 @@ import trong.lixco.com.ejb.service.elearning.PlanService;
 import trong.lixco.com.ejb.service.elearning.SkillDetailService;
 import trong.lixco.com.ejb.service.elearning.SkillService;
 import trong.lixco.com.ejb.service.elearning.StoragePathService;
+import trong.lixco.com.ejb.service.elearning.TestResultService;
 import trong.lixco.com.jpa.entities.Course;
 import trong.lixco.com.jpa.entities.Plan;
 import trong.lixco.com.jpa.entities.PlanDetail;
 import trong.lixco.com.jpa.entities.PlanDetailSkill;
 import trong.lixco.com.jpa.entities.Skill;
 import trong.lixco.com.jpa.entities.SkillDetail;
+import trong.lixco.com.jpa.entities.TestResult;
 import trong.lixco.com.util.Notify;
 import trong.lixco.com.util.PDFMerger;
 
@@ -72,8 +74,10 @@ public class CourseEmployeeDetailBean extends AbstractBean<Course> {
 	private PlanDetailSkillService PlAN_DETAIL_SKILL_SERVICE;
 	@Inject
 	private PlanDetailService PLAN_DETAIL_SERVICE;
-	// end use
+	@Inject
+	private TestResultService TEST_RESULT_SERVICE;
 
+	// end use
 	@Override
 	protected void initItem() {
 		try {
@@ -84,12 +88,24 @@ public class CourseEmployeeDetailBean extends AbstractBean<Course> {
 				pdPlaying = PLAN_DETAIL_SERVICE.findById(idPlanDetail);
 				avgCourse = pdPlaying.getAvg_score();
 				pdSkillsByPD = PlAN_DETAIL_SKILL_SERVICE.findBySkillAndPlanDetail(0, idPlanDetail);
+				// kiem tra thu bai test nao da hoan thanh
+				for (int i = 0; i < pdSkillsByPD.size(); i++) {
+					List<TestResult> ts = TEST_RESULT_SERVICE.findByPDSId(pdSkillsByPD.get(i).getId());
+					if (!ts.isEmpty()) {
+						pdSkillsByPD.get(i).setSuccess(true);
+					}
+				}
 			} else {
 				return;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	// kiem tra xem bai thi da duoc thuc hien hay chua
+	public void checkTestSuccess() {
+
 	}
 
 	public long getPlanDetailId() {

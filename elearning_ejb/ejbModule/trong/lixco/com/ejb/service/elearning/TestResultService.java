@@ -67,4 +67,32 @@ public class TestResultService extends AbstractService<TestResult> {
 			return new TestResult();
 		}
 	}
+
+	public List<TestResult> findByPDSId(long pdsId) {
+		if (pdsId == 0) {
+			return new ArrayList<>();
+		}
+		// primary
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaQuery<TestResult> cq = cb.createQuery(TestResult.class);
+		Root<TestResult> root = cq.from(TestResult.class);
+		List<Predicate> queries = new ArrayList<>();
+		if (pdsId != 0) {
+			Predicate foodNameQuery = cb.equal(root.get("plan_detail_skill").get("id"), pdsId);
+			queries.add(foodNameQuery);
+		}
+		Predicate data[] = new Predicate[queries.size()];
+		for (int i = 0; i < queries.size(); i++) {
+			data[i] = queries.get(i);
+		}
+		Predicate finalPredicate = cb.and(data);
+		cq.where(finalPredicate);
+		TypedQuery<TestResult> query = em.createQuery(cq);
+		List<TestResult> results = query.getResultList();
+		if (!results.isEmpty()) {
+			return results;
+		} else {
+			return new ArrayList<>();
+		}
+	}
 }

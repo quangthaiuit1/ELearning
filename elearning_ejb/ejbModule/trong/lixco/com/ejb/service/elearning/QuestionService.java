@@ -18,9 +18,10 @@ import javax.persistence.criteria.Root;
 
 import trong.lixco.com.ejb.service.AbstractService;
 import trong.lixco.com.jpa.entities.Question;
+
 @Stateless
 @TransactionManagement(TransactionManagementType.CONTAINER)
-public class QuestionService extends AbstractService<Question>{
+public class QuestionService extends AbstractService<Question> {
 	@Inject
 	private EntityManager em;
 	@Resource
@@ -42,6 +43,9 @@ public class QuestionService extends AbstractService<Question>{
 	}
 
 	public List<Question> findBySkill(long skillId) {
+		if (skillId == 0) {
+			return new ArrayList<>();
+		}
 		// primary
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Question> cq = cb.createQuery(Question.class);

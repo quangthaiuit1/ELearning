@@ -3,6 +3,7 @@ package trong.lixco.com.jpa.entities;
 import javax.persistence.Entity;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import trong.lixco.com.jpa.entity.AbstractEntity;
 
@@ -11,7 +12,9 @@ import trong.lixco.com.jpa.entity.AbstractEntity;
 // chi tiet ke hoach tung ki nang
 public class PlanDetailSkill extends AbstractEntity {
 	private double score = 0;
-	
+	@Transient
+	private boolean isSuccess = false;
+
 	@OneToOne
 	private Skill skill;
 	@OneToOne
@@ -56,5 +59,13 @@ public class PlanDetailSkill extends AbstractEntity {
 
 	public void setPlan_detail(PlanDetail plan_detail) {
 		this.plan_detail = plan_detail;
+	}
+
+	public boolean isSuccess() {
+		return isSuccess;
+	}
+
+	public void setSuccess(boolean isSuccess) {
+		this.isSuccess = isSuccess;
 	}
 }

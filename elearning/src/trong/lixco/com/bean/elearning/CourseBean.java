@@ -195,7 +195,9 @@ public class CourseBean extends AbstractBean<Course> {
 	}
 
 	public void skillDetailOnRowSelect() {
-		pathVideo = skillDetailSelected.getFile_video();
+		if (skillDetailSelected.getFile_video() != null) {
+			pathVideo = skillDetailSelected.getFile_video();
+		}
 		// if (skillSelected != null && skillSelected.getId() != null) {
 		// questionsBySkill =
 		// QUESTION_SERVICE.findBySkill(skillSelected.getId());

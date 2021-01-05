@@ -56,6 +56,15 @@ legend.ui-fieldset-legend.ui-corner-all.ui-state-default {
 .animated .ui-progressbar-value {
 	background-image: url("#{resource['images/pbar-ani.gif']}");
 }
+
+.ui-panelgrid.showcase-text-align-center .ui-grid-responsive .ui-panelgrid-cell
+	{
+	text-align: center;
+}
+
+.customPanelGrid .ui-panelgrid-content {
+	align-items: center;
+}
 </style>
 		<script type="text/javascript">
     //<![CDATA[
@@ -103,15 +112,22 @@ legend.ui-fieldset-legend.ui-corner-all.ui-state-default {
 							<p:column headerText="Nội dung" style="width:25%">
 								<h:outputText value="#{item1.skill.name}" />
 							</p:column>
-							<p:column headerText="Mô tả" style="width:50%; text-align:center">
+							<p:column headerText="Mô tả" style="width:45%; text-align:center">
 								<h:outputText value="#{item1.skill.description}" />
 							</p:column>
 							<p:column headerText="Điểm" style="width:5%">
 								<h:outputText value="#{item1.score}" />
 							</p:column>
+							<p:column headerText="Đã thực hiện" style="width:5%">
+								<p:panelGrid styleClass="showcase-text-align-center"
+									rendered="#{item1.success}">
+									<i style="margin-left: 12px" class="fa fa-fw fa-check-square-o"></i>
+								</p:panelGrid>
+							</p:column>
 							<p:column headerText="Bài kiểm tra" style="width:15%">
 								<p:linkButton outcome="test" value="Thực hiện" target="_blank"
-									style="width:100%" styleClass="btsave">
+									style="width:100%" styleClass="btsave"
+									rendered="#{!item1.success}">
 									<f:param name="skillid" value="#{item1.skill.id}" />
 									<f:param name="pdsid" value="#{item1.id}" />
 								</p:linkButton>
