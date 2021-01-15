@@ -1,6 +1,7 @@
 package trong.lixco.com.bean.elearning;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,26 +15,36 @@ import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.docx4j.org.xhtmlrenderer.pdf.ITextRenderer;
 import org.jboss.logging.Logger;
 import org.omnifaces.cdi.ViewScoped;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.FileUploadEvent;
 
+import com.ibm.icu.text.SimpleDateFormat;
+
 import trong.lixco.com.account.servicepublics.Member;
 import trong.lixco.com.bean.AbstractBean;
 import trong.lixco.com.bean.staticentity.MessageView;
+import trong.lixco.com.bean.staticentity.QuestionTypeUtil;
 import trong.lixco.com.ejb.service.elearning.AnswerService;
 import trong.lixco.com.ejb.service.elearning.CourseService;
 import trong.lixco.com.ejb.service.elearning.CourseTypeService;
 import trong.lixco.com.ejb.service.elearning.QuestionService;
+import trong.lixco.com.ejb.service.elearning.QuestionTypeService;
 import trong.lixco.com.ejb.service.elearning.SkillDetailService;
 import trong.lixco.com.ejb.service.elearning.SkillService;
 import trong.lixco.com.ejb.service.elearning.StoragePathService;
@@ -81,6 +92,9 @@ public class CourseBean extends AbstractBean<Course> {
 	private Answer answerUpdate;
 	private Answer answerNew;
 
+	private int scoreMaxTracNghiem = 0;
+	private int scoreMaxTuLuan = 0;
+
 	private Notify notify;
 
 	private String pathVideo = "";
@@ -98,6 +112,8 @@ public class CourseBean extends AbstractBean<Course> {
 	private SkillDetailService SKILL_DETAIL_SERVICE;
 	@Inject
 	private QuestionService QUESTION_SERVICE;
+	@Inject
+	private QuestionTypeService QUESTION_TYPE_SERVICE;
 	@Inject
 	private AnswerService ANSWER_SERVICE;
 
@@ -564,6 +580,132 @@ public class CourseBean extends AbstractBean<Course> {
 		}
 	}
 
+	// import file excel
+	public void handleFileUpload(FileUploadEvent event) throws IOException {
+
+		// context.execute("PF('dlg1').show();");
+		long size = event.getFile().getSize();
+
+		String filename = FilenameUtils.getBaseName(event.getFile().getFileName());
+
+		String path = FacesContext.getCurrentInstance().getExternalContext().getRealPath("/temp/");
+		File checkFile = new File(path);
+		if (!checkFile.exists()) {
+			checkFile.mkdirs();
+		}
+
+		SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMddHHmmss");
+		String name = filename + fmt.format(new Date())
+				+ event.getFile().getFileName().substring(event.getFile().getFileName().lastIndexOf('.'));
+		File file = new File(path + "/" + name);
+
+		InputStream is = event.getFile().getInputstream();
+		OutputStream out = new FileOutputStream(file);
+		byte buf[] = new byte[(int) size];
+		int len;
+		while ((len = is.read(buf)) > 0)
+			out.write(buf, 0, len);
+		is.close();
+		out.close();
+
+		InputStream inp = null;
+		try {
+			inp = new FileInputStream(file.getAbsolutePath());
+			Workbook wb = WorkbookFactory.create(inp);
+
+			for (int i = 0; i < wb.getNumberOfSheets(); i++) {
+				System.out.println(wb.getSheetAt(i).getSheetName());
+				echoAsCSVFile(wb.getSheetAt(i));
+			}
+		} catch (Exception ex) {
+		} finally {
+			try {
+				inp.close();
+			} catch (IOException ex) {
+			}
+		}
+	}
+
+	public void echoAsCSVFile(Sheet sheet) {
+		Row row = null;
+		boolean isError = false;
+
+		for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+			row = sheet.getRow(i);
+			try {
+				// tao cau hoi
+				long qTypeId = (long) Double.parseDouble(row.getCell(0).toString());
+
+				String qContent = row.getCell(1).toString();
+				// kiem tra thu cau hoi da co hay chua
+				Question qIsExist = QUESTION_SERVICE.findByNameAndSkill(qContent, skillSelected.getId());
+				if (qIsExist.getId() == null || qIsExist.getId() == 0) {
+					qIsExist = new Question();
+					qIsExist.setCreatedDate(new Date());
+					qIsExist.setCreatedUser(member.getCode());
+					qIsExist.setName_question(qContent);
+					if (qTypeId != 1 && qTypeId != 2) {
+						MessageView.ERROR("Định dạng file không hợp lệ!");
+						return;
+					}
+					qIsExist.setQuestion_type(QUESTION_TYPE_SERVICE.findById(qTypeId));
+					qIsExist.setSkill(skillSelected);
+					qIsExist = QUESTION_SERVICE.create(qIsExist);
+				}
+				// cau hoi trac nghiem
+				if (qTypeId == QuestionTypeUtil.TRAC_NGHIEM_ID) {
+					// tao dap an
+					String answerContent = row.getCell(2).toString();
+					Answer aNew = new Answer();
+					aNew.setCreatedDate(new Date());
+					aNew.setCreatedUser(member.getCode());
+					aNew.setName(answerContent);
+					aNew.setQuestion(qIsExist);
+					// set dap an dung
+					if (!row.getCell(3).toString().isEmpty()) {
+						long isTrue = (long) Double.parseDouble(row.getCell(3).toString());
+						if (isTrue == 1) {
+							aNew.setIs_true(true);
+						}
+					}
+					ANSWER_SERVICE.create(aNew);
+				}
+
+			} catch (Exception e) {
+				isError = true;
+				e.printStackTrace();
+			}
+		}
+		if (!isError) {
+			MessageView.INFO("Thành công");
+		} else {
+			MessageView.ERROR("Lỗi");
+		}
+
+	}
+
+	public void fileTestMau() {
+		try {
+			PrimeFaces.current().executeScript("target='_blank';monitorDownload( showStatus , hideStatus)");
+			String filename = "bai_test_dulieumau";
+			HttpServletResponse httpServletResponse = (HttpServletResponse) FacesContext.getCurrentInstance()
+					.getExternalContext().getResponse();
+			httpServletResponse.addHeader("Content-disposition", "attachment; filename=" + filename + ".xlsx");
+			ServletOutputStream servletOutputStream = httpServletResponse.getOutputStream();
+			String file = FacesContext.getCurrentInstance().getExternalContext()
+					.getRealPath("/resources/maufile/BaiTest_Elearning_dulieumau.xlsx");
+			InputStream inputStream = new FileInputStream(file);
+			byte[] buffer = new byte[1024];
+			int len;
+			while ((len = inputStream.read(buffer)) != -1) {
+				servletOutputStream.write(buffer, 0, len);
+			}
+			FacesContext.getCurrentInstance().responseComplete();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	// test video
 	private String events = "";
 
@@ -810,5 +952,21 @@ public class CourseBean extends AbstractBean<Course> {
 
 	public void setAnswerNew(Answer answerNew) {
 		this.answerNew = answerNew;
+	}
+
+	public int getScoreMaxTracNghiem() {
+		return scoreMaxTracNghiem;
+	}
+
+	public void setScoreMaxTracNghiem(int scoreMaxTracNghiem) {
+		this.scoreMaxTracNghiem = scoreMaxTracNghiem;
+	}
+
+	public int getScoreMaxTuLuan() {
+		return scoreMaxTuLuan;
+	}
+
+	public void setScoreMaxTuLuan(int scoreMaxTuLuan) {
+		this.scoreMaxTuLuan = scoreMaxTuLuan;
 	}
 }

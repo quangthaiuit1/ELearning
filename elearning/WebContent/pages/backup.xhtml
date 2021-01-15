@@ -20,3 +20,27 @@
 		</h:panelGrid>
 	</div>
 </c:forEach>
+
+<b:row style="margin-top: 20px;width:100%">
+	<b:video small-screen="two-thirds"
+		src="../../resources/videos/#{courseEmployeeDetailBean.pathVideo}"
+		style="width:100%;margin-left: 2%"
+		onplay="ajax:courseEmployeeDetailBean.onPlay()"
+		onpause="ajax:courseEmployeeDetailBean.onPause()"
+		onloadeddata="ajax:courseEmployeeDetailBean.onLoadeddataNew()"
+		oncanplaythrough="ajax:courseEmployeeDetailBean.onCanplaythrough()"
+		onseeking="ajax:courseEmployeeDetailBean.onSeeking()">
+	</b:video>
+</b:row>
+
+<!-- logo -->
+<div class="logo">
+	<p:commandLink action="#{applicationBean.logoutHome()}">
+		<img src="#{request.contextPath}/resources/gfx/lixco_logo.png"
+			style="width: 100px; height: 50px" />
+		<span
+			style="color: rgba(128, 128, 128, 0.27); font-weight: bold; font-size: 12px;">
+			#{sessionScope.database} </span>
+	</p:commandLink>
+</div>
+<!-- end logo -->

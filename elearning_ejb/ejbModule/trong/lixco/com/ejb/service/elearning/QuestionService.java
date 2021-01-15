@@ -77,7 +77,36 @@ public class QuestionService extends AbstractService<Question> {
 		Root<Question> root = cq.from(Question.class);
 		List<Predicate> queries = new ArrayList<>();
 		if (name != null) {
-			Predicate foodNameQuery = cb.equal(root.get("name"), name);
+			Predicate foodNameQuery = cb.equal(root.get("name_question"), name);
+			queries.add(foodNameQuery);
+		}
+		Predicate data[] = new Predicate[queries.size()];
+		for (int i = 0; i < queries.size(); i++) {
+			data[i] = queries.get(i);
+		}
+		Predicate finalPredicate = cb.and(data);
+		cq.where(finalPredicate);
+		TypedQuery<Question> query = em.createQuery(cq);
+		List<Question> results = query.getResultList();
+		if (!results.isEmpty()) {
+			return results.get(0);
+		} else {
+			return new Question();
+		}
+	}
+
+	public Question findByNameAndSkill(String name, long skillId) {
+		// primary
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaQuery<Question> cq = cb.createQuery(Question.class);
+		Root<Question> root = cq.from(Question.class);
+		List<Predicate> queries = new ArrayList<>();
+		if (name != null) {
+			Predicate foodNameQuery = cb.equal(root.get("name_question"), name);
+			queries.add(foodNameQuery);
+		}
+		if (skillId != 0) {
+			Predicate foodNameQuery = cb.equal(root.get("skill").get("id"), skillId);
 			queries.add(foodNameQuery);
 		}
 		Predicate data[] = new Predicate[queries.size()];

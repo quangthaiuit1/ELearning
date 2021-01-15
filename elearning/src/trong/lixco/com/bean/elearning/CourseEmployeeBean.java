@@ -1,13 +1,17 @@
 package trong.lixco.com.bean.elearning;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
 
 import org.jboss.logging.Logger;
 import org.omnifaces.cdi.ViewScoped;
@@ -21,6 +25,7 @@ import trong.lixco.com.account.servicepublics.MemberServicePublicProxy;
 import trong.lixco.com.bean.AbstractBean;
 import trong.lixco.com.bean.entities.PositionJobData;
 import trong.lixco.com.bean.entities.PositionJobDataService;
+import trong.lixco.com.bean.staticentity.DateUtil;
 import trong.lixco.com.bean.staticentity.MessageView;
 import trong.lixco.com.ejb.service.elearning.CoursePositionJobService;
 import trong.lixco.com.ejb.service.elearning.CourseService;
@@ -50,7 +55,10 @@ public class CourseEmployeeBean extends AbstractBean<Course> {
 	private List<PositionJobData> positionsByEmplList;
 	private PositionJobData positionSelected;
 	private List<Course> coursesByPosition;
+	private List<Course> allCourse;
 	private List<PlanDetail> detailsByPlan;
+	private List<PlanDetail> planDetailsComing;
+	private PlanDetail planDetailSelected;
 
 	DepartmentServicePublic departmentServicePublic;
 	MemberServicePublic memberServicePublic;
@@ -90,11 +98,23 @@ public class CourseEmployeeBean extends AbstractBean<Course> {
 			}
 			yearSearch = Calendar.getInstance().get(Calendar.YEAR);
 			searchItem();
+			allCourse = COURSE_SERVICE.findAll();
+			//tim khoa hoc sap dien ra
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
+	public void handleComingCourses(List<Course> allCourse){
+		// Date currentDate = new Date();
+		// for(Course c : allCourse){
+		// if(currentDate.before(c.getStart_date())){
+		// planDetailsComing.add(e)
+		// }
+		// }
+	}
+	
 	public void planShowEdit() {
 		// tim vi tri chuc danh theo nhan vien duoc chon
 		positionsByEmpl = PositionJobDataService.vttheonhanvien(planSelected.getEmployee_code());
@@ -107,6 +127,31 @@ public class CourseEmployeeBean extends AbstractBean<Course> {
 
 	public void searchItem() {
 		plansByDepart = PLAN_SERVICE.findByEmplCodeAndYear(member.getCode(), yearSearch);
+		if (!plansByDepart.isEmpty()) {
+			// tim vi tri chuc danh theo nhan vien duoc chon
+			positionsByEmpl = PositionJobDataService.vttheonhanvien(plansByDepart.get(0).getEmployee_code());
+			positionsByEmplList = Arrays.asList(positionsByEmpl);
+			// query danh sach chi tiet ke hoach
+			detailsByPlan = PLAN_DETAIL_SERVICE.findByPlan(plansByDepart.get(0).getId());
+			positionSelected = new PositionJobData();
+			coursesByPosition = new ArrayList<>();
+		}
+		// ke hoach chua duoc tao
+		else {
+			detailsByPlan = new ArrayList<>();
+		}
+	}
+
+	public void ajaxHandleEndDate(Course item) {
+		// System.out.println(item);
+		// tim kiem va set ngay ket thuc
+		for (int i = 0; i < allCourse.size(); i++) {
+			if (allCourse.get(i).getId() == item.getId()) {
+				// tinh ngay ket thuc
+				allCourse.get(i).setEnd_date(DateUtil.addDays(item.getStart_date(), item.getTime()));
+				break;
+			}
+		}
 	}
 
 	// tim danh sach khoa hoc theo vi tri
@@ -124,6 +169,20 @@ public class CourseEmployeeBean extends AbstractBean<Course> {
 			if (p != null && p.getId() != null) {
 				coursesByPosition.get(i).setSelect(true);
 			}
+		}
+	}
+
+	public void planDetailOnRowSelect() {
+		try {
+			FacesContext fContext = FacesContext.getCurrentInstance();
+			ExternalContext extContext = fContext.getExternalContext();
+			HttpServletRequest ht = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext()
+					.getRequest();
+			String path = "http://" + ht.getServerName() + ":" + ht.getServerPort()
+					+ "/elearning/pages/nhanvien/chitietkhoahoc.htm?pdid=" + planDetailSelected.getId();
+			extContext.redirect(path);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -184,12 +243,44 @@ public class CourseEmployeeBean extends AbstractBean<Course> {
 		}
 	}
 
-	public void removeKPIPersonOther() {
-
-	}
-
-	public void delete() {
-
+	public void registerNewCourse() {
+		try {
+			if (plansByDepart != null && !plansByDepart.isEmpty()) {
+				for (int i = 0; i < allCourse.size(); i++) {
+					if (allCourse.get(i).isSelect()) {
+						PlanDetail pd = PLAN_DETAIL_SERVICE.findByCourseAndPlan(allCourse.get(i).getId(),
+								plansByDepart.get(0).getId());
+						// khoa hoc chua duoc tao
+						// them moi
+						if (pd.getId() == null) {
+							// phai co ngay bat dau cho khoa hoc
+							if (allCourse.get(i).getStart_date() != null && allCourse.get(i).getEnd_date() != null) {
+								pd = new PlanDetail(allCourse.get(i), plansByDepart.get(0),
+										allCourse.get(i).getStart_date(), allCourse.get(i).getEnd_date());
+								PLAN_DETAIL_SERVICE.create(pd);
+							}
+							// khong co ngay bat dau
+							else {
+								MessageView.ERROR("Vui lòng nhập ngày bắt đầu khóa học");
+								return;
+							}
+						}
+						allCourse.get(i).setSelect(false);
+					}
+				}
+				// query danh sach chi tiet ke hoach
+				detailsByPlan = PLAN_DETAIL_SERVICE.findByPlan(plansByDepart.get(0).getId());
+				MessageView.INFO("Thành công");
+			}
+			// ke hoach chua duoc tao
+			else {
+				MessageView.WARN("Kế hoạch năm chưa được tạo");
+				return;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			MessageView.ERROR("Lỗi");
+		}
 	}
 
 	public void saveOrUpdate() {
@@ -214,6 +305,10 @@ public class CourseEmployeeBean extends AbstractBean<Course> {
 		}
 		detailsByPlan = PLAN_DETAIL_SERVICE.findByPlan(planSelected.getId());
 		MessageView.INFO("Thành công");
+	}
+
+	public String moveToChiTietKhoaHoc(long itemId) {
+		return "chitietkhoahoc?faces-redirect=true&pdid=" + itemId;
 	}
 
 	@Override
@@ -309,4 +404,27 @@ public class CourseEmployeeBean extends AbstractBean<Course> {
 		this.detailsByPlan = detailsByPlan;
 	}
 
+	public PlanDetail getPlanDetailSelected() {
+		return planDetailSelected;
+	}
+
+	public void setPlanDetailSelected(PlanDetail planDetailSelected) {
+		this.planDetailSelected = planDetailSelected;
+	}
+
+	public List<Course> getAllCourse() {
+		return allCourse;
+	}
+
+	public void setAllCourse(List<Course> allCourse) {
+		this.allCourse = allCourse;
+	}
+
+	public List<PlanDetail> getPlanDetailsComing() {
+		return planDetailsComing;
+	}
+
+	public void setPlanDetailsComing(List<PlanDetail> planDetailsComing) {
+		this.planDetailsComing = planDetailsComing;
+	}
 }

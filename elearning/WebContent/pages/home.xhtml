@@ -27,6 +27,12 @@
 .progressPanel .ui-progressbar.ui-widget-content {
 	margin-bottom: 0px;
 }
+
+#headerid {
+	background-image: url("#{resource['images/background2.jpg']}");
+	background-size: cover;
+	background-repeat: no-repeat;
+}
 </style>
 	<script>
 	//<![CDATA[
@@ -122,9 +128,9 @@
 		    }
 		    return false;
 		}
-		
-		
- 	});
+			
+			
+	 	});
 	//]]>
 
 		
@@ -170,20 +176,12 @@
 	<div>
 		<div class="divheader" id="headerid">
 			<div class="bgheader">
-				<div class="wrapper">
-					<div class="logo">
-						<p:commandLink action="#{applicationBean.logoutHome()}">
-							<img src="#{request.contextPath}/resources/gfx/lixco_logo.png"
-								style="width: 100px; height: 50px" />
-							<span
-								style="color: rgba(128, 128, 128, 0.27); font-weight: bold; font-size: 12px;">
-								#{sessionScope.database} </span>
-						</p:commandLink>
-					</div>
+				<div class="wrapper"
+					style="background-color: none !important; color: white">
 					<div class="main_menu">
 						<ul>
-							<li><a href="#"><i class="fa fa-user" />#{sessionScope.account.userName},
-									Hi</a>
+							<li><a href="#" style="color: white"><i
+									class="fa fa-user" />Hi, #{sessionScope.account.userName} </a>
 								<ul>
 									<li style="height: 50px; padding-top: 5px;"><p:commandLink
 											action="#{applicationBean.getAccountFormSession}"
@@ -192,10 +190,10 @@
 											<i class="fa fa-user"
 												style="height: 50px; width: 40px; float: left; font-size: 35px; text-align: center" />
 											<div
-												style="float: right; width: 160px; margin-right: 10px; text-align: right">
-												<span>#{sessionScope.account.member.name}</span><br /> <span
-													style="font-size: 11px;">Last login:
-													#{applicationBean.hourLogin}</span>
+												style="float: right; width: 160px; margin-right: 10px; text-align: rightb">
+												<span style="color: black">#{sessionScope.account.member.name}</span><br />
+												<span style="font-size: 11px; color: black">Last
+													login: #{applicationBean.hourLogin}</span>
 											</div>
 										</p:commandLink></li>
 									<div class="divclear" />
@@ -219,20 +217,21 @@
 										onstart="document.getElementById('ajaxStatusPanel').style.display='none';" />
 									<p:commandLink update=":danhsachthongbao,:notice"
 										oncomplete="PF('thongbaohethong').show();"
-										action="#{applicationBean.showNoticeSystem}">
+										action="#{applicationBean.showNoticeSystem}"
+										style="color:white">
 										<i
 											class="fa fa-bell #{sessionScope.account.notice==true?'myanimation':''} "></i>Thông báo</p:commandLink>
 								</h:form></li>
 							<li class="space" />
 							<li><p:commandLink
 									action="#{applicationBean.setSettingPerson}"
-									oncomplete="PF('caidathethong').show();" update=":caidat">
+									style="color:white" oncomplete="PF('caidathethong').show();"
+									update=":caidat">
 									<i class="fa fa-cogs"></i>Cài đặt</p:commandLink></li>
 						</ul>
 						<div class="clear"></div>
 					</div>
 					<div style="clear: both;">
-						<h1>E Learning</h1>
 						<h:form id="showheaderform"
 							style="margin: auto; margin-top: -20px;width: 50px;">
 							<p:commandButton styleClass="hidenbutton" value=""

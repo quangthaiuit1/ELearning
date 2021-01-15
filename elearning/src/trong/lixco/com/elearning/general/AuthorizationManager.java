@@ -69,8 +69,10 @@ public class AuthorizationManager implements Serializable {
 		urlPermissions = new ArrayList<UrlPermission>();
 		uriUnprotected = new ArrayList<String>();
 		uriUnprotected.add("/elearning/pages/home.htm");
-		uriUnprotected.add("/elearning/pages/dangkycom.htm");
-		uriUnprotected.add("/elearning/pages/dangkycommobile.htm");
+		uriUnprotected.add("/elearning/pages/nhanvien/dskhoahoc.htm");
+		uriUnprotected.add("/elearning/pages/nhanvien/chitietkhoahoc.htm");
+		uriUnprotected.add("/elearning/pages/nhanvien/test.htm");
+		uriUnprotected.add("/elearning/pages/nhanvien/thongtinkhoahoc.htm");
 	}
 
 	public Program getProgram() {

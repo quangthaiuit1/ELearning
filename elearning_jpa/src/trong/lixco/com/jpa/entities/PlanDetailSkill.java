@@ -11,9 +11,15 @@ import trong.lixco.com.jpa.entity.AbstractEntity;
 @Table(name = "plan_detail_skill")
 // chi tiet ke hoach tung ki nang
 public class PlanDetailSkill extends AbstractEntity {
-	private double score = 0;
+	private double score_tuluan = 0;
+	private double score_tracnghiem = 0;
+	private double score_total = 0;
+	private double score_max_tracnghiem = 10;
+	private double score_max_tuluan = 0;
 	@Transient
 	private boolean isSuccess = false;
+	@Transient
+	private boolean isExpired = false;
 
 	@OneToOne
 	private Skill skill;
@@ -30,19 +36,45 @@ public class PlanDetailSkill extends AbstractEntity {
 		this.plan_detail = plan_detail;
 	}
 
-	public PlanDetailSkill(double score, Skill skill, PlanDetail plan_detail) {
+	public PlanDetailSkill(double score_tuluan, double score_tracnghiem, Skill skill, PlanDetail plan_detail,
+			double score_total) {
 		super();
-		this.score = score;
+		this.score_tuluan = score_tuluan;
+		this.score_tracnghiem = score_tracnghiem;
+		this.skill = skill;
+		this.plan_detail = plan_detail;
+		this.score_total = score_total;
+	}
+
+	public PlanDetailSkill(double score_tuluan, double score_tracnghiem, double score_total,
+			double score_max_tracnghiem, double score_max_tuluan, boolean isSuccess, boolean isExpired, Skill skill,
+			PlanDetail plan_detail) {
+		super();
+		this.score_tuluan = score_tuluan;
+		this.score_tracnghiem = score_tracnghiem;
+		this.score_total = score_total;
+		this.score_max_tracnghiem = score_max_tracnghiem;
+		this.score_max_tuluan = score_max_tuluan;
+		this.isSuccess = isSuccess;
+		this.isExpired = isExpired;
 		this.skill = skill;
 		this.plan_detail = plan_detail;
 	}
 
-	public double getScore() {
-		return score;
+	public double getScore_tuluan() {
+		return score_tuluan;
 	}
 
-	public void setScore(double score) {
-		this.score = score;
+	public void setScore_tuluan(double score_tuluan) {
+		this.score_tuluan = score_tuluan;
+	}
+
+	public double getScore_tracnghiem() {
+		return score_tracnghiem;
+	}
+
+	public void setScore_tracnghiem(double score_tracnghiem) {
+		this.score_tracnghiem = score_tracnghiem;
 	}
 
 	public Skill getSkill() {
@@ -67,5 +99,37 @@ public class PlanDetailSkill extends AbstractEntity {
 
 	public void setSuccess(boolean isSuccess) {
 		this.isSuccess = isSuccess;
+	}
+
+	public boolean isExpired() {
+		return isExpired;
+	}
+
+	public void setExpired(boolean isExpired) {
+		this.isExpired = isExpired;
+	}
+
+	public double getScore_total() {
+		return score_total;
+	}
+
+	public void setScore_total(double score_total) {
+		this.score_total = score_total;
+	}
+
+	public double getScore_max_tracnghiem() {
+		return score_max_tracnghiem;
+	}
+
+	public void setScore_max_tracnghiem(double score_max_tracnghiem) {
+		this.score_max_tracnghiem = score_max_tracnghiem;
+	}
+
+	public double getScore_max_tuluan() {
+		return score_max_tuluan;
+	}
+
+	public void setScore_max_tuluan(double score_max_tuluan) {
+		this.score_max_tuluan = score_max_tuluan;
 	}
 }

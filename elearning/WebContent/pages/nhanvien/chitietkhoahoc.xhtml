@@ -79,152 +79,64 @@ legend.ui-fieldset-legend.ui-corner-all.ui-state-default {
 				type="submit" onclick="this.form.target='_blank'" id="report"
 				action="#{kPIPersonBean.printOnly()}" />
 		</h:form>
-		<p:tabView id="tv" widgetVar="myTab">
-			<p:tab title="Kĩ năng">
-				<h:form id="tab1">
-					<p:fieldset legend="Điểm trung bình khóa học"
-						style="width:25%;margin: 0 auto;font-weight:normal"
-						styleClass="noneformatfs" id="fieldsetDTB">
-						<h:outputText style="font-size:30px"
-							value="#{courseEmployeeDetailBean.avgCourse}" />
-					</p:fieldset>
-					<div class="ui-g">
-						<p:dataTable var="item1" selectionMode="single"
-							selection="#{courseEmployeeDetailBean.pdSkillSelected}"
-							value="#{courseEmployeeDetailBean.pdSkillsByPD}"
-							rowsPerPageTemplate="10,25,50" scrollable="true" paginator="true"
-							paginatorPosition="bottom" tyleClass="tableformat1"
-							scrollHeight="100%" rowKey="#{item1.id}" id="dtSkill"
-							style="width:100%;height:328px;margin-bottom:30px"
-							rowIndexVar="rowIndex">
-							<p:ajax event="rowSelect"
-								listener="#{courseEmployeeDetailBean.skillOnRowSelect()}"
-								update="tv:tab2" />
-							<f:facet name="header">
-								<p:commandButton value="Tính ĐTB KH" style="margin-left:88%;"
-									styleClass="btadd" update="tv:tab1:fieldsetDTB"
-									action="#{courseEmployeeDetailBean.handleAVGCourse()}" />
-							</f:facet>
-							<p:column headerText="STT" style="width:5%;text-align:center">
-								<h:outputText value="#{rowIndex+1}" />
-							</p:column>
+		<h:form id="tab1">
+			<p:fieldset legend="Điểm trung bình khóa học"
+				style="width:25%;margin: 0 auto;font-weight:normal"
+				styleClass="noneformatfs" id="fieldsetDTB">
+				<h:outputText style="font-size:30px"
+					value="#{courseEmployeeDetailBean.avgCourse}" />
+			</p:fieldset>
+			<div class="ui-g">
+				<p:dataTable var="item1" selectionMode="single"
+					selection="#{courseEmployeeDetailBean.pdSkillSelected}"
+					value="#{courseEmployeeDetailBean.pdSkillsByPD}"
+					rowsPerPageTemplate="10,25,50" scrollable="true" paginator="true"
+					paginatorPosition="bottom" tyleClass="tableformat1"
+					scrollHeight="100%" rowKey="#{item1.id}" id="dtSkill"
+					style="width:100%;height:328px;margin-bottom:30px"
+					rowIndexVar="rowIndex">
+					<p:ajax event="rowSelect"
+						listener="#{courseEmployeeDetailBean.skillOnRowSelect()}" />
+					<p:column headerText="STT" style="width:5%;text-align:center">
+						<h:outputText value="#{rowIndex+1}" />
+					</p:column>
 
-							<p:column headerText="Nội dung" style="width:25%">
-								<h:outputText value="#{item1.skill.name}" />
-							</p:column>
-							<p:column headerText="Mô tả" style="width:45%; text-align:center">
-								<h:outputText value="#{item1.skill.description}" />
-							</p:column>
-							<p:column headerText="Điểm" style="width:5%">
-								<h:outputText value="#{item1.score}" />
-							</p:column>
-							<p:column headerText="Đã thực hiện" style="width:5%">
-								<p:panelGrid styleClass="showcase-text-align-center"
-									rendered="#{item1.success}">
-									<i style="margin-left: 12px" class="fa fa-fw fa-check-square-o"></i>
-								</p:panelGrid>
-							</p:column>
-							<p:column headerText="Bài kiểm tra" style="width:15%">
-								<p:linkButton outcome="test" value="Thực hiện" target="_blank"
-									style="width:100%" styleClass="btsave"
-									rendered="#{!item1.success}">
-									<f:param name="skillid" value="#{item1.skill.id}" />
-									<f:param name="pdsid" value="#{item1.id}" />
-								</p:linkButton>
-							</p:column>
-							<f:facet name="footer">
-								<div style="clear: both;" />
-							</f:facet>
-						</p:dataTable>
-					</div>
-				</h:form>
-			</p:tab>
-			<p:tab title="Chi tiết">
-				<h:form id="tab2">
-					<div class="ui-g">
-						<p:dataTable var="item2" selectionMode="single"
-							selection="#{courseEmployeeDetailBean.skillDetailSelected}"
-							value="#{courseEmployeeDetailBean.skillDetailsBySkill}"
-							rowsPerPageTemplate="10,25,50" scrollable="true" paginator="true"
-							paginatorPosition="bottom" tyleClass="tableformat1"
-							scrollHeight="100%" rowKey="#{item2.id}" id="dtSkillDetail"
-							style="width:100%;height:328px;margin-bottom:30px"
-							rowIndexVar="rowIndex">
-							<p:ajax event="rowSelect"
-								listener="#{courseEmployeeDetailBean.skillDetailOnRowSelect()}"
-								update="tv:tab3" />
-							<p:column headerText="STT" style="width:5%;text-align:center">
-								<h:outputText value="#{rowIndex+1}" />
-							</p:column>
-
-							<p:column headerText="Nội dung" style="width:25%">
-								<h:outputText value="#{item2.name}" />
-							</p:column>
-							<p:column headerText="Mô tả" style="width:70%;">
-								<h:outputText value="#{item2.description}" />
-							</p:column>
-							<f:facet name="footer">
-								<div style="clear: both;" />
-							</f:facet>
-						</p:dataTable>
-					</div>
-				</h:form>
-			</p:tab>
-			<p:tab title="Thông tin">
-				<h:form id="tab3" style="text-align:center">
-					<h3 style="margin-bottom: 20px">#{courseEmployeeDetailBean.skillDetailSelected.name}</h3>
-					<h4 style="text-align: center">Tài liệu</h4>
-					<p:separator style="width:30%;margin-top:0px" />
-					<br />
-					<br />
-					<p:commandLink value="Xem file (PDF)" process="@this"
-						style="font-size: 12px;text-decoration: underline;color: blue;font-style: italic;text-align:center"
-						actionListener="#{courseEmployeeDetailBean.processDataAssign()}" />
-					<br />
-					<br />
-					<h4 style="text-align: center">Video</h4>
-					<p:separator style="width:30%;margin-top:0px" />
-					<br />
-					<br />
-					<b:row style="margin-top: 20px;">
-						<b:video small-screen="two-thirds"
-							src="../../resources/videos/#{courseEmployeeDetailBean.pathVideo}"
-							style="width:100%;margin-left: 22%"
-							onplay="ajax:courseEmployeeDetailBean.onPlay()"
-							onpause="ajax:courseEmployeeDetailBean.onPause()"
-							onloadeddata="ajax:courseEmployeeDetailBean.onLoadeddataNew()"
-							oncanplaythrough="ajax:courseEmployeeDetailBean.onCanplaythrough()"
-							onseeking="ajax:courseEmployeeDetailBean.onSeeking()">
-						</b:video>
-					</b:row>
-				</h:form>
-			</p:tab>
-		</p:tabView>
+					<p:column headerText="Nội dung" style="width:25%">
+						<h:outputText value="#{item1.skill.name}" />
+					</p:column>
+					<p:column headerText="Mô tả" style="width:40% ">
+						<h:outputText value="#{item1.skill.description}" />
+					</p:column>
+					<p:column headerText="Điểm" style="width:5%;text-align:center">
+						<h:outputText value="#{item1.score_tracnghiem}" />
+					</p:column>
+					<p:column headerText="Đã thực hiện" style="width:5%">
+						<p:panelGrid styleClass="showcase-text-align-center"
+							rendered="#{item1.success}">
+							<i style="margin-left: 12px" class="fa fa-fw fa-check-square-o"></i>
+						</p:panelGrid>
+					</p:column>
+					<p:column headerText="Đã hết hạn" style="width:5%">
+						<p:panelGrid styleClass="showcase-text-align-center"
+							rendered="#{item1.expired}">
+							<i style="margin-left: 12px; color: red"
+								class="fa fa-fw fa-check-square-o"></i>
+						</p:panelGrid>
+					</p:column>
+					<p:column headerText="Bài kiểm tra" style="width:15%">
+						<p:linkButton outcome="test" value="Kiểm tra" target="_blank"
+							style="width:100%" styleClass="btsave"
+							rendered="#{!item1.success and !item1.expired}">
+							<f:param name="skillid" value="#{item1.skill.id}" />
+							<f:param name="pdsid" value="#{item1.id}" />
+						</p:linkButton>
+					</p:column>
+					<f:facet name="footer">
+						<div style="clear: both;" />
+					</f:facet>
+				</p:dataTable>
+			</div>
+		</h:form>
 		<br />
-
-		<p:dialog widgetVar="wgvCreateCourse"
-			style="max-width: 800px; max-height:800px" modal="true"
-			resizable="false" closeOnEscape="true" header="Thêm khóa học mới"
-			id="dialogCreateSource">
-			<h:form id="formCreateCourse">
-				<h:outputText value="Tên:" style="font-weight:bold" />
-				<p:inputTextarea placeholder="Tên khóa học"
-					value="#{courseBean.courseNew.name}" />
-				<h:outputText value="Giới thiệu:"
-					style="font-weight:bold ;margin-top: 15px" />
-				<p:inputTextarea placeholder="Mô tả chi tiết:"
-					value="#{courseBean.courseNew.description}"
-					style="margin-top:5px;min-height:150px" />
-				<br />
-				<br />
-				<center>
-					<p:commandButton style="align:center;" styleClass="btadd"
-						type="submit" value="Thêm" action="#{courseBean.createCourse()}"
-						icon="ui-icon-plus" oncomplete="PF('wgvCreateCourse').hide();"
-						update="growlPlan" />
-				</center>
-			</h:form>
-		</p:dialog>
-
 	</ui:define>
 </ui:composition>

@@ -26,6 +26,16 @@
 div#formTest {
 	width: 100%
 }
+
+.title-thai {
+	font-family: 'Segoe UI', Arial, sans-serif;
+	font-size: 1.0em;
+	font-weight: bold;
+}
+
+.ui-widget-content {
+	border: none;
+}
 </style>
 </h:head>
 <h:body
@@ -37,28 +47,62 @@ div#formTest {
 		</div>
 		<div class="ui-g-9">
 			<h5
-				style="color: white; margin-top: 20px; margin-left: 13%; font-size: 20px;">CÔNG
+				style="color: white; margin-top: 20px; margin-left: 13%; font-size: 20px; font-family: Arial;">CÔNG
 				TY CỔ PHẦN BỘT GIẶT LIX</h5>
 		</div>
 	</div>
 	<div class="ui-g" style="background: white; width: 100%">
 		<h:form id="formTest" style="width:100%!important;">
-			<div class="ui-g" style="background: white; width: 100%">
-				<p:dataList value="#{testBean.qAndAnswers}" var="item"
-					type="definition" rowIndexVar="index" style="width:100%">
-					<h:outputText value="Câu #{index + 1}: " style="margin-left:5px" />
-					<h:outputText value="#{item.question.name_question}" />
-					<f:facet name="description">
-						<p:selectOneRadio id="answer#{index + 1}"
-							value="#{testBean.answersResp[index + 1]}" layout="responsive"
-							columns="1" converter="abstractConverter">
-							<f:selectItems value="#{item.answers}" var="answer"
-								itemLabel="#{answer.name}" itemValue="#{answer}">
-							</f:selectItems>
-						</p:selectOneRadio>
-					</f:facet>
-				</p:dataList>
-			</div>
+			<!-- TRAC NGHIEM -->
+			<c:if test="#{testBean.haveTracNghiem == true}">
+				<div class="ui-g">
+					<span class="title-thai"
+						style="margin: 0 auto; margin-bottom: 15px; margin-top: 10px;">PHẦN
+						THI: TRẮC NGHIỆM</span> <span class="group-description"><p
+							style="text-align: center; margin-left: 5px"></p></span>
+				</div>
+				<div class="ui-g" style="background: white; width: 100%">
+					<p:dataList value="#{testBean.qAndAnswers}" var="item"
+						type="definition" rowIndexVar="index" style="width:100%">
+						<h:outputText value="Câu #{index + 1}: " style="margin-left:25px" />
+						<h:outputText value="#{item.question.name_question}" />
+						<f:facet name="description">
+							<p:selectOneRadio id="answer#{index + 1}"
+								value="#{testBean.answersResp[index + 1]}" layout="responsive"
+								columns="1" converter="abstractConverter">
+								<f:selectItems value="#{item.answers}" var="answer"
+									itemLabel="#{answer.name}" itemValue="#{answer}">
+								</f:selectItems>
+							</p:selectOneRadio>
+						</f:facet>
+					</p:dataList>
+				</div>
+			</c:if>
+			<!-- END TRAC NGHIEM -->
+			<!-- TU LUAN -->
+			<c:if test="#{testBean.haveTuLuan == true}">
+				<div class="ui-g">
+					<span class="title-thai"
+						style="margin: 0 auto; margin-bottom: 15px;">PHẦN THI: TỰ
+						LUẬN</span> <span class="group-description"><p
+							style="text-align: center; margin-left: 5px"></p></span>
+				</div>
+				<c:set var="evenCount" value="${testBean.qAndAnswers.size()}" />
+				<c:forEach items="#{testBean.qAndAnswerTuLuans}" var="question1">
+					<c:set var="evenCount" value="${evenCount+1}" />
+					<h:outputText value="Câu #{evenCount}: "
+						style="margin-left: 25px;font-family: Arial;font-size:13px" />
+					<h:outputText value="#{question1.question.name_question}"
+						style="font-family: Arial;font-size:13px" />
+					<br></br>
+					<br />
+					<p:inputTextarea id="id2_#{evenCount}"
+						style="margin-bottom: 5px;width: 80%;margin-left:10px" rows="6"
+						cols="33" value="#{question1.answer}" />
+					<br />
+				</c:forEach>
+			</c:if>
+			<!-- END TU LUAN -->
 			<div class="ui-g"
 				style="text-align: center; margin-top: 10px; margin-bottom: 10px">
 				<p:commandButton styleClass="btsave" style=" margin: 0 auto"
@@ -68,17 +112,17 @@ div#formTest {
 			</div>
 		</h:form>
 	</div>
-	<div style="background-color: #15aad3; height: 100px;text-align: center">
+	<div
+		style="background-color: #15aad3; height: 100px; text-align: center">
 		<center>
 			<h:outputText
-				style="text-align: center; color: white;margin-bottom:5px;margin-top:25px;height:auto"
+				style="text-align: center; color: white;margin-bottom:5px;margin-top:25px;height:auto;font-family: Arial;"
 				value=" Số 3 Đường Số 2, P. Linh Trung, Q. Thủ Đức, TP. HCM."
-				styleClass="fa fa-location-arrow">
-			</h:outputText>
+				styleClass="fa fa-location-arrow" />
 		</center>
 		<center>
 			<h:outputText
-				style="text-align: center; color: white;margin-top:15px;height:auto"
+				style="text-align: center; color: white;margin-top:15px;height:auto;font-family: Arial;"
 				value=" 028 - 38 964 072" styleClass="fa fa-phone-square">
 			</h:outputText>
 		</center>

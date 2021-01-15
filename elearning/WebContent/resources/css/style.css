@@ -1,7 +1,10 @@
 body {
 	margin: 0px;
-	background: url(#{request.contextPath}/resources/gfx/background.png);
-	background-repeat: repeat;
+	background: url(#{request.contextPath}/resources/images/background2.jpg);
+	background-size: cover;
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+	
 }
 
 .thai {
@@ -304,7 +307,6 @@ a:link {
 }
 
 .wrapper {
-	background: white;
 	margin: 0px auto;
 }
 

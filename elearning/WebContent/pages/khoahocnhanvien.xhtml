@@ -224,30 +224,5 @@
 			</p:tab>
 		</p:tabView>
 		<br />
-
-		<p:dialog widgetVar="wgvCreateCourse"
-			style="max-width: 800px; max-height:800px" modal="true"
-			resizable="false" closeOnEscape="true" header="Thêm khóa học mới"
-			id="dialogCreateSource">
-			<h:form id="formCreateCourse">
-				<h:outputText value="Tên:" style="font-weight:bold" />
-				<p:inputTextarea placeholder="Tên khóa học"
-					value="#{courseBean.courseNew.name}" />
-				<h:outputText value="Giới thiệu:"
-					style="font-weight:bold ;margin-top: 15px" />
-				<p:inputTextarea placeholder="Mô tả chi tiết:"
-					value="#{courseBean.courseNew.description}"
-					style="margin-top:5px;min-height:150px" />
-				<br />
-				<br />
-				<center>
-					<p:commandButton style="align:center;" styleClass="btadd"
-						type="submit" value="Thêm" action="#{courseBean.createCourse()}"
-						icon="ui-icon-plus" oncomplete="PF('wgvCreateCourse').hide();"
-						update="growlCourse" />
-				</center>
-			</h:form>
-		</p:dialog>
-
 	</ui:define>
 </ui:composition>

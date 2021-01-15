@@ -219,11 +219,11 @@
 								</p:column>
 
 								<p:column headerText="Tên khóa học"
-									style="width:25%;text-align:center">
+									style="width:25%;">
 									<h:outputText value="#{item4.name}" />
 								</p:column>
 								<p:column headerText="Mô tả"
-									style="width:55%; text-align:center">
+									style="width:55%;">
 									<h:outputText value="#{item4.description}" />
 								</p:column>
 
@@ -232,6 +232,42 @@
 								</f:facet>
 							</p:dataTable>
 						</div>
+					</div>
+					<div class="ui-g" style="margin-top: 30px">
+						<div class="ui-g-6">
+							<p:dataTable var="item6" value="#{coursePlanBean.coursesOption}"
+								rowsPerPageTemplate="25,50,100" scrollable="true"
+								paginator="true" paginatorPosition="bottom"
+								tyleClass="tableformat1" scrollHeight="100%"
+								rowKey="#{item6.id}" id="dtCourseOption"
+								style="width:100%;height:328px;margin-left:10px"
+								rowIndexVar="rowIndex">
+								<f:facet name="header">
+									<h:outputText value="Khóa học tự chọn" />
+								</f:facet>
+								<p:column headerText="..." style="width:10%;text-align:center">
+									<p:selectBooleanCheckbox value="#{item6.select}" itemLabel="">
+										<p:ajax process="@this" />
+									</p:selectBooleanCheckbox>
+								</p:column>
+								<p:column headerText="STT" style="width:10%;text-align:center">
+									<h:outputText value="#{rowIndex+1}" />
+								</p:column>
+								<p:column headerText="Tên khóa học"
+									style="width:25%;">
+									<h:outputText value="#{item6.name}" />
+								</p:column>
+								<p:column headerText="Mô tả"
+									style="width:55%;">
+									<h:outputText value="#{item6.description}" />
+								</p:column>
+
+								<f:facet name="footer">
+									<div style="clear: both;" />
+								</f:facet>
+							</p:dataTable>
+						</div>
+						<div class="ui-g-6"></div>
 					</div>
 				</h:form>
 			</p:tab>
@@ -258,7 +294,7 @@
 						</p:column>
 
 						<p:column headerText="Tên khóa học"
-							style="width:25%;text-align:center">
+							style="width:25%;">
 							<h:outputText value="#{item5.course.name}" />
 						</p:column>
 						<p:column headerText="Mô tả" style="width:45%; text-align:center">
@@ -286,30 +322,5 @@
 			</p:tab>
 		</p:tabView>
 		<br />
-
-		<p:dialog widgetVar="wgvCreateCourse"
-			style="max-width: 800px; max-height:800px" modal="true"
-			resizable="false" closeOnEscape="true" header="Thêm khóa học mới"
-			id="dialogCreateSource">
-			<h:form id="formCreateCourse">
-				<h:outputText value="Tên:" style="font-weight:bold" />
-				<p:inputTextarea placeholder="Tên khóa học"
-					value="#{courseBean.courseNew.name}" />
-				<h:outputText value="Giới thiệu:"
-					style="font-weight:bold ;margin-top: 15px" />
-				<p:inputTextarea placeholder="Mô tả chi tiết:"
-					value="#{courseBean.courseNew.description}"
-					style="margin-top:5px;min-height:150px" />
-				<br />
-				<br />
-				<center>
-					<p:commandButton style="align:center;" styleClass="btadd"
-						type="submit" value="Thêm" action="#{courseBean.createCourse()}"
-						icon="ui-icon-plus" oncomplete="PF('wgvCreateCourse').hide();"
-						update="growlPlan" />
-				</center>
-			</h:form>
-		</p:dialog>
-
 	</ui:define>
 </ui:composition>

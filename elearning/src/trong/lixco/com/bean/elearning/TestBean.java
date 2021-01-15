@@ -17,12 +17,16 @@ import org.omnifaces.cdi.ViewScoped;
 import trong.lixco.com.account.servicepublics.Member;
 import trong.lixco.com.bean.AbstractBean;
 import trong.lixco.com.bean.entities.QuestionAndAnswer;
+import trong.lixco.com.bean.entities.QuestionAndAnswerTuLuan;
 import trong.lixco.com.bean.staticentity.MessageView;
+import trong.lixco.com.bean.staticentity.QuestionTypeUtil;
 import trong.lixco.com.ejb.service.elearning.AnswerService;
+import trong.lixco.com.ejb.service.elearning.PlanDetailService;
 import trong.lixco.com.ejb.service.elearning.PlanDetailSkillService;
 import trong.lixco.com.ejb.service.elearning.QuestionService;
 import trong.lixco.com.ejb.service.elearning.TestResultService;
 import trong.lixco.com.jpa.entities.Answer;
+import trong.lixco.com.jpa.entities.PlanDetail;
 import trong.lixco.com.jpa.entities.PlanDetailSkill;
 import trong.lixco.com.jpa.entities.Question;
 import trong.lixco.com.jpa.entities.TestResult;
@@ -33,9 +37,12 @@ public class TestBean extends AbstractBean {
 
 	private static final long serialVersionUID = 1L;
 	private List<QuestionAndAnswer> qAndAnswers;
+	private List<QuestionAndAnswerTuLuan> qAndAnswerTuLuans;
 	private long pdsId = 0; // plan detail skill
 	private long skillid = 0;
 	private Member member;
+	private boolean isHaveTracNghiem = false;
+	private boolean isHaveTuLuan = false;
 
 	// private List<Question> questionsBySkill;
 	private Answer[] answersResp; // dap an tra loi
@@ -46,6 +53,8 @@ public class TestBean extends AbstractBean {
 	private AnswerService ANSWER_SERVICE;
 	@Inject
 	private PlanDetailSkillService PLAN_DETAIL_SKILL_SERVICE;
+	@Inject
+	private PlanDetailService PLAN_DETAIL_SERVICE;
 	@Inject
 	private TestResultService TEST_RESULT_SERVICE;
 
@@ -64,13 +73,26 @@ public class TestBean extends AbstractBean {
 		// cau hoi theo ki nang
 		List<Question> questionsBySkill = QUESTION_SERVICE.findBySkill(skillid);
 		qAndAnswers = new ArrayList<>();
+		qAndAnswerTuLuans = new ArrayList<>();
 		for (int i = 0; i < questionsBySkill.size(); i++) {
-			List<Answer> answers = ANSWER_SERVICE.findByQuestion(questionsBySkill.get(i).getId());
-			if (!answers.isEmpty() && answers != null) {
-				QuestionAndAnswer qa = new QuestionAndAnswer(questionsBySkill.get(i), answers);
-				qAndAnswers.add(qa);
-				answersResp = new Answer[qAndAnswers.size() + 1];
+			// check co tu luan hoac trac nghiem khong
+			// trac nghiem
+			if (questionsBySkill.get(i).getQuestion_type().getId() == QuestionTypeUtil.TRAC_NGHIEM_ID) {
+				isHaveTracNghiem = true;
+				List<Answer> answers = ANSWER_SERVICE.findByQuestion(questionsBySkill.get(i).getId());
+				if (!answers.isEmpty() && answers != null) {
+					QuestionAndAnswer qa = new QuestionAndAnswer(questionsBySkill.get(i), answers);
+					qAndAnswers.add(qa);
+					answersResp = new Answer[qAndAnswers.size() + 1];
+				}
 			}
+			// tu luan
+			if (questionsBySkill.get(i).getQuestion_type().getId() == QuestionTypeUtil.TU_LUAN_ID) {
+				isHaveTuLuan = true;
+				QuestionAndAnswerTuLuan qTL = new QuestionAndAnswerTuLuan(questionsBySkill.get(i));
+				qAndAnswerTuLuans.add(qTL);
+			}
+
 		}
 	}
 
@@ -135,7 +157,8 @@ public class TestBean extends AbstractBean {
 			PlanDetailSkill p = PLAN_DETAIL_SKILL_SERVICE.findById(pdsId);
 			for (int i = 1; i < answersResp.length; i++) {
 				try {
-					TestResult t = new TestResult(member.getCode(), answersResp[i], p);
+					TestResult t = new TestResult(member.getCode(), answersResp[i].getName(),
+							answersResp[i].getQuestion(), p);
 					TEST_RESULT_SERVICE.create(t);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -151,18 +174,36 @@ public class TestBean extends AbstractBean {
 			}
 
 			double sodiem = ((double) 10 / (double) qAndAnswers.size()) * (double) socaudung;
-			p.setScore(sodiem);
-			PlanDetailSkill pd = PLAN_DETAIL_SKILL_SERVICE.update(p);
-			if (pd != null && pd.getId() != null) {
-				redirectTo(pd.getPlan_detail().getId());
-				MessageView.INFO("Thành công");
-				return;
+			p.setScore_tracnghiem(sodiem);
+			p.setScore_total(sodiem);
+			PlanDetailSkill pds = PLAN_DETAIL_SKILL_SERVICE.update(p);
+			if (pds != null && pds.getId() != null) {
+				redirectTo(pds.getPlan_detail().getId());
+				// handle tinh diem trung binh khoa hoc
+				double totalScore = 0;
+				List<PlanDetailSkill> pdss = PLAN_DETAIL_SKILL_SERVICE.findBySkillAndPlanDetail(0,
+						pds.getPlan_detail().getId());
+				for (PlanDetailSkill s : pdss) {
+					totalScore = totalScore + s.getScore_total();
+				}
+				double avg = totalScore / (double) pdss.size();
+				PlanDetail pd = pds.getPlan_detail();
+				pd.setAvg_score(avg);
+				PLAN_DETAIL_SERVICE.update(pd);
 			} else {
 				MessageView.ERROR("Lỗi");
+				return;
 			}
+			// luu dap an tu luan
+			for (QuestionAndAnswerTuLuan q : qAndAnswerTuLuans) {
+				TestResult t = new TestResult(member.getCode(), q.getAnswer(), q.getQuestion(), p);
+				TEST_RESULT_SERVICE.create(t);
+			}
+			MessageView.INFO("Thành công");
 
 		} catch (Exception e) {
 			e.printStackTrace();
+			MessageView.ERROR("Lỗi");
 		}
 	}
 
@@ -185,6 +226,30 @@ public class TestBean extends AbstractBean {
 
 	public void setAnswersResp(Answer[] answersResp) {
 		this.answersResp = answersResp;
+	}
+
+	public boolean isHaveTracNghiem() {
+		return isHaveTracNghiem;
+	}
+
+	public void setHaveTracNghiem(boolean isHaveTracNghiem) {
+		this.isHaveTracNghiem = isHaveTracNghiem;
+	}
+
+	public boolean isHaveTuLuan() {
+		return isHaveTuLuan;
+	}
+
+	public void setHaveTuLuan(boolean isHaveTuLuan) {
+		this.isHaveTuLuan = isHaveTuLuan;
+	}
+
+	public List<QuestionAndAnswerTuLuan> getqAndAnswerTuLuans() {
+		return qAndAnswerTuLuans;
+	}
+
+	public void setqAndAnswerTuLuans(List<QuestionAndAnswerTuLuan> qAndAnswerTuLuans) {
+		this.qAndAnswerTuLuans = qAndAnswerTuLuans;
 	}
 
 }

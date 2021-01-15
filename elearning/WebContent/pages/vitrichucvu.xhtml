@@ -64,7 +64,8 @@
 					<p:commandButton style="margin-left:85%;width:180px"
 						action="#{positionJobBean.syncFromCenter()}"
 						styleClass="btnWarning" type="submit" value="Đồng bộ từ trung tâm"
-						process="@form" update="dtPosition" icon="fa fa-refresh" />
+						process="@form" update="dtPosition,growlPosition"
+						icon="fa fa-refresh" />
 				</div>
 				<p:dataTable value="#{positionJobBean.positions}" paginator="true"
 					rowsPerPageTemplate="50,100,150" scrollable="true"

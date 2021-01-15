@@ -24,6 +24,18 @@ public class PlanDetail extends AbstractEntity {
 	@Temporal(TemporalType.DATE)
 	private Date end_time;
 
+	public PlanDetail() {
+		super();
+	}
+
+	public PlanDetail(Course course, Plan plan, Date start_time, Date end_time) {
+		super();
+		this.course = course;
+		this.plan = plan;
+		this.start_time = start_time;
+		this.end_time = end_time;
+	}
+
 	public Date getStart_time() {
 		return start_time;
 	}

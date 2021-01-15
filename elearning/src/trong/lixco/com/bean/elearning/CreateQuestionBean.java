@@ -55,7 +55,7 @@ public class CreateQuestionBean extends AbstractBean<Question> {
 		try {
 			HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext()
 					.getRequest();
-			String skillIdTemp = request.getParameter("qid");
+			String skillIdTemp = request.getParameter("sid");
 			if (!skillIdTemp.equals("null")) {
 				skillId = Long.parseLong(skillIdTemp);
 			}

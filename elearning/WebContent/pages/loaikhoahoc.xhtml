@@ -104,6 +104,9 @@
 								update="dtCategoryFood">
 								<h:outputText style="color:red;font-size:15px"
 									class="fa fa-fw fa-remove" />
+								<p:confirm header="Thông báo"
+									message="Bạn có chắc chắn muốn xóa?"
+									icon="pi pi-exclamation-triangle" />
 							</p:commandLink>
 						</center>
 					</p:column>
@@ -115,6 +118,12 @@
 			</p:fieldset>
 			<br />
 		</h:form>
+		<p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+			<p:commandButton value="Đồng ý" type="button" style="margin-left:10%;"
+				styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+			<p:commandButton value="Hủy bỏ" type="button"
+				styleClass="ui-confirmdialog-no" icon="pi pi-times" />
+		</p:confirmDialog>
 		<p:dialog widgetVar="widgetThemMonAn" resizable="false"
 			header="Thêm loại khóa học" width="500" height="350">
 			<h:form id="formThemMonAn">
@@ -138,12 +147,16 @@
 		</p:dialog>
 		<!-- DIALOG CHINH SUA -->
 		<p:dialog widgetVar="widgetCapNhatMonAn" resizable="false"
-			header="Cập nhật loại khóa học " width="500" height="350">
+			header="Cập nhật loại khóa học " modal="true" width="500"
+			height="350">
 			<h:form id="formCapNhatMonAn">
 				<h:outputText value="Tên:" style="font-weight:bold" />
 				<p:inputTextarea placeholder="Tên loại khóa học: "
 					value="#{courseTypeBean.courseTypeUpdate.name}"
-					style="margin-top:5px" />
+					style="margin-top:5px;margin-bottom:10px" />
+				<br />
+				<h:outputText value="Mô tả:"
+					style="font-weight:bold;margin-top:15px" />
 				<p:inputTextarea placeholder="Mô tả: "
 					value="#{courseTypeBean.courseTypeUpdate.description}"
 					style="margin-top:5px" />
@@ -152,9 +165,10 @@
 			</h:form>
 			<br />
 			<center>
-				<p:commandButton form="formCapNhatMonAn" style="align:center"
-					styleClass="btsave" type="submit" value="Cập nhật"
-					action="#{courseTypeBean.updateItem()}" icon="ui-icon-plus"
+				<p:commandButton form="formCapNhatMonAn"
+					style="align:center;margin-top:20%" styleClass="btnWarning"
+					type="submit" value="Cập nhật"
+					action="#{courseTypeBean.updateItem()}" icon="fa fa-save"
 					update="detail" />
 			</center>
 		</p:dialog>

@@ -90,8 +90,7 @@
 									<p:column headerText="STT" style="width:5%;text-align:center;">
 										<h:outputText value="#{rowIndex+1}" />
 									</p:column>
-									<p:column filterBy="#{item.name}"
-										headerText="Tên loại khóa học"
+									<p:column filterBy="#{item.name}" headerText="Loại khóa học"
 										style="width:20%;text-align:center; min-height: 200px!important;"
 										filterFunction="#{abstractCustomFilter.filterByText}">
 										<h:outputText value="#{item.name}" />
@@ -111,30 +110,35 @@
 									tyleClass="tableformat1" scrollHeight="100%"
 									rowKey="#{item1.id}" id="dtCourse"
 									style="width:100%;height:528px;margin-left:10px"
-									rowIndexVar="rowIndex" selectionMode="single"
-									selection="#{courseBean.courseSelected}">
+									scrollWidth="500px" rowIndexVar="rowIndex"
+									selectionMode="single" selection="#{courseBean.courseSelected}">
 									<p:ajax event="rowSelect"
 										listener="#{courseBean.courseOnRowSelect}"
 										update="tv:formCourse:dtSkill" />
 									<f:facet name="header">
-										<p:commandButton style="margin-left: 80%;width:120px"
+										<p:commandButton style="margin-left: 79%;width:120px"
 											styleClass="btadd" type="submit" value="Thêm" process="@form"
 											oncomplete="PF('wgvCreateCourse').show();"
 											icon="ui-icon-plus" />
 									</f:facet>
-									<p:column headerText="STT" style="width:5%;text-align:center">
-										<h:outputText value="#{rowIndex+1}" />
+									<p:column headerText="ID" style="width:50px;text-align:center">
+										<h:outputText value="#{item1.id}" />
 									</p:column>
 
-									<p:column headerText="Tên khóa học"
-										style="width:50%;text-align:center">
+									<p:column headerText="Khóa học"
+										style="width:100px;text-align:center" filterBy="#{item1.name}"
+										filterFunction="#{abstractCustomFilter.filterByText}">
 										<h:outputText value="#{item1.name}" />
 									</p:column>
 									<p:column headerText="Mô tả"
-										style="width:25%; text-align:center">
+										style="width:200px; text-align:center">
 										<h:outputText value="#{item1.description}" />
 									</p:column>
-									<p:column headerText="Sửa" style="width:10%">
+									<p:column headerText="Thời lượng (ngày)"
+										style="width:50px;text-align:center">
+										<h:outputText value="#{item1.time}" />
+									</p:column>
+									<p:column headerText="Sửa" style="width:50px">
 										<center>
 											<p:commandLink
 												action="#{courseBean.assignValueUpdateCourse(item1)}"
@@ -145,7 +149,7 @@
 											</p:commandLink>
 										</center>
 									</p:column>
-									<p:column headerText="Xóa" style="width:10%">
+									<p:column headerText="Xóa" style="width:50px">
 										<center>
 											<p:commandLink action="#{courseBean.deleteCourse(item1)}"
 												process="@this" value=""
@@ -174,7 +178,8 @@
 								<p:ajax event="rowSelect"
 									listener="#{courseBean.skillOnRowSelect}" update="tv:tab2" />
 								<f:facet name="header">
-									<p:commandButton style="margin-left: 90%;width:120px"
+									<h:outputText value="KĨ NĂNG" style="font-size:20px" />
+									<p:commandButton style="margin-left: 89%;width:120px"
 										styleClass="btadd" type="submit" value="Thêm" process="@form"
 										oncomplete="PF('wgvCreateSkill').show();" icon="ui-icon-plus" />
 								</f:facet>
@@ -182,7 +187,7 @@
 									<h:outputText value="#{rowIndex+1}" />
 								</p:column>
 
-								<p:column headerText="Tên khóa học"
+								<p:column headerText="Kĩ năng"
 									style="width:50%;text-align:center">
 									<h:outputText value="#{item2.name}" />
 								</p:column>
@@ -277,6 +282,7 @@
 							</f:facet>
 						</p:dataTable>
 					</div>
+					<p:separator style="background-color:black" />
 					<h4 style="text-align: center; margin-top: 20px">BÀI TEST</h4>
 					<div class="ui-g">
 						<div class="ui-g-6">
@@ -287,16 +293,34 @@
 								paginator="true" paginatorPosition="bottom"
 								tyleClass="tableformat1" scrollHeight="100%"
 								rowKey="#{item4.id}" id="dtQuestion"
-								style="width:100%;height:328px;margin-bottom:30px"
-								rowIndexVar="rowIndex">
+								style="width:100%;height:528px;" rowIndexVar="rowIndex">
 								<p:ajax event="rowSelect"
 									listener="#{courseBean.questionOnRowSelect()}"
 									update="tv:tab2:dtAnswer" />
 								<f:facet name="header">
+									<!-- upload excel -->
+									<p:commandButton value="File excel mẫu" immediate="true"
+										styleClass="btlink"
+										onclick="monitorDownload( showStatus , hideStatus)"
+										actionListener="#{courseBean.fileTestMau()}" />
+									<!-- Upload file excel -->
+									<h:form enctype="multipart/form-data">
+										<p:fileUpload
+											fileUploadListener="#{courseBean.handleFileUpload}"
+											mode="advanced" dragDropSupport="false" multiple="true"
+											update="messagesh,growlCourse" sizeLimit="10000000"
+											allowTypes="/(\.|\/)(xls|xlsx)$/" label="Chọn tệp tải lên"
+											uploadLabel="Tải lên" cancelLabel="Hủy" process="@form" />
+										<p:growl id="messagesh" showDetail="true" />
+									</h:form>
+									<!-- end upload -->
+									<p:commandButton style="width:195px;margin-left:33%"
+										styleClass="btsave" type="submit"
+										value="Cài đặt điểm từng phần"
+										oncomplete="PF('wgvCreateScore').show();" icon="fa fa-cog" />
 									<p:linkButton icon="fa fa-plus" styleClass="btadd"
-										outcome="taocauhoi" value="Tạo câu hỏi mới"
-										style="margin-left:70%">
-										<f:param name="qid" value="#{courseBean.skillSelected.id}" />
+										outcome="taocauhoi" value="Tạo câu hỏi mới">
+										<f:param name="sid" value="#{courseBean.skillSelected.id}" />
 									</p:linkButton>
 								</f:facet>
 								<p:column headerText="STT" width="10" style="text-align:center">
@@ -357,20 +381,17 @@
 					<p:separator style="width:50%;float:left;margin-top:0px" />
 					<br />
 					<br />
-					<p:commandLink value="Tải lên (PDF)" style="font-size:12px"
+					<p:commandLink value="Tải lên (PDF)" style="font-size:14px"
 						oncomplete="PF('dialogDataAssign').show();" process="@this" />
 					<p:commandLink value="Xem file (PDF)" process="@this"
-						style="font-size: 12px;text-decoration: underline;color: blue;font-style: italic;margin-left:20px"
+						style="font-size: 14px;text-decoration: underline;color: blue;font-style: italic;margin-left:20px"
 						actionListener="#{courseBean.processDataAssign()}" />
 					<h4 style="margin-top: 30px">Video</h4>
 					<p:separator style="width:50%;float:left;margin-top:0px" />
 					<br />
 					<br />
-					<p:commandLink value="Tải lên (file .mp4)" style="font-size:12px"
+					<p:commandLink value="Tải lên (file .mp4)" style="font-size:14px"
 						oncomplete="PF('dialogDataVideo').show();" process="@this" />
-					<p:commandLink value="Xem file" process="@this"
-						style="font-size: 12px;text-decoration: underline;color: blue;font-style: italic;margin-left:20px"
-						actionListener="#{courseBean.processDataAssign()}" />
 					<b:row style="margin-top: 20px">
 						<b:video small-screen="two-thirds"
 							src="../resources/videos/#{courseBean.pathVideo}"
@@ -585,7 +606,7 @@
 		</p:dialog>
 		<p:dialog widgetVar="wgvCreateAnswer"
 			style="max-width: 800px; max-height:800px" modal="true"
-			resizable="false" closeOnEscape="true" header="Thêm kĩ năng mới"
+			resizable="false" closeOnEscape="true" header="Thêm đáp án"
 			id="dialogCreateAnswer">
 			<h:form id="formCreateAnswer">
 				<h:outputText value="Tên:" style="font-weight:bold" />
@@ -603,6 +624,31 @@
 						action="#{courseBean.createAnswer()}"
 						update="tv:tab2:dtAnswer,growlCourse,dialogCreateAnswer"
 						oncomplete="PF('wgvCreateAnswer').hide();" />
+				</center>
+			</h:form>
+		</p:dialog>
+		<p:dialog widgetVar="wgvCreateScore"
+			style="max-width: 800px; max-height:800px" modal="true"
+			resizable="false" closeOnEscape="true"
+			header="Cài đặt điểm cho từng phần" id="dialogCreateScore">
+			<h:form id="formCreateScore">
+				<h:outputText value="Phần trắc nghiệm (số điểm tối đa):"
+					style="font-weight:bold" />
+				<p:spinner id="spinnerTracNghiem"
+					value="#{courseBean.scoreMaxTracNghiem}" />
+				<br />
+				<br />
+				<h:outputText value="Phần tự luận (số điểm tối đa):"
+					style="font-weight:bold ;margin-top: 25px" />
+				<p:spinner id="spinnerTuLuan" value="#{courseBean.scoreMaxTuLuan}" />
+				<br />
+				<br />
+				<center>
+					<p:commandButton style="align:center;" styleClass="btnWarning"
+						type="submit" value="Lưu" icon="ui-icon-plus"
+						action="#{courseBean.createAnswer()}"
+						update="tv:tab2:dtAnswer,growlCourse,dialogCreateAnswer"
+						oncomplete="PF('wgvCreateScore').hide();" />
 				</center>
 			</h:form>
 		</p:dialog>

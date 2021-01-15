@@ -10,13 +10,22 @@ import trong.lixco.com.jpa.entity.AbstractEntity;
 @Table(name = "test_result")
 public class TestResult extends AbstractEntity {
 	private String employee_code;
+	private String answer;
 	@OneToOne
-	private Answer answer;
+	private Question question;
 	@OneToOne
 	private PlanDetailSkill plan_detail_skill;
 
 	public TestResult() {
 		super();
+	}
+
+	public TestResult(String employee_code, String answer, Question question, PlanDetailSkill plan_detail_skill) {
+		super();
+		this.employee_code = employee_code;
+		this.answer = answer;
+		this.question = question;
+		this.plan_detail_skill = plan_detail_skill;
 	}
 
 	public String getEmployee_code() {
@@ -27,26 +36,27 @@ public class TestResult extends AbstractEntity {
 		this.employee_code = employee_code;
 	}
 
-	public TestResult(String employee_code, Answer answer, PlanDetailSkill plan_detail_skill) {
-		super();
-		this.employee_code = employee_code;
-		this.answer = answer;
-		this.plan_detail_skill = plan_detail_skill;
-	}
-
-	public Answer getAnswer() {
-		return answer;
-	}
-
-	public void setAnswer(Answer answer) {
-		this.answer = answer;
-	}
-
 	public PlanDetailSkill getPlan_detail_skill() {
 		return plan_detail_skill;
 	}
 
 	public void setPlan_detail_skill(PlanDetailSkill plan_detail_skill) {
 		this.plan_detail_skill = plan_detail_skill;
+	}
+
+	public String getAnswer() {
+		return answer;
+	}
+
+	public void setAnswer(String answer) {
+		this.answer = answer;
+	}
+
+	public Question getQuestion() {
+		return question;
+	}
+
+	public void setQuestion(Question question) {
+		this.question = question;
 	}
 }

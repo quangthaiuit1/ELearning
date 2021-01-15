@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" xmlns:b="http://bootsfaces.net/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:h="http://java.sun.com/jsf/html" template="/pages/home.xhtml">
+
+	<ui:define name="content">
+		<style>
+.ui-dialog {
+	overflow: scroll !important;
+	max-height: 100% !important;
+}
+
+.sldapan label {
+	width: 90%;
+	margin-right: 0px !important;
+}
+
+.sldapan {
+	width: 100%;
+	margin: 0px;
+}
+
+.sldapan td {
+	padding: 0px;
+	text-align: left;
+}
+
+.lnumber {
+	background: #009688;
+	padding: 5px 10px;
+	color: white;
+	border-radius: 30px;
+	margin-right: 10px;
+}
+
+.lcauhoi {
+	font-size: 1.2em !important;
+	font-weight: bold;
+	color: #009688;
+}
+
+.diemdanhgia {
+	font-size: 1.1em !important;
+	text-decoration: underline !important;
+	color: #0e8bee !important;
+}
+
+legend.ui-fieldset-legend.ui-corner-all.ui-state-default {
+	font-size: 17px;
+}
+
+.animated .ui-progressbar-value {
+	background-image: url("#{resource['images/pbar-ani.gif']}");
+}
+
+.ui-panelgrid.showcase-text-align-center .ui-grid-responsive .ui-panelgrid-cell
+	{
+	text-align: center;
+}
+
+.customPanelGrid .ui-panelgrid-content {
+	align-items: center;
+}
+</style>
+		<script type="text/javascript">
+    //<![CDATA[
+	function playVideo() {
+		/* setInterval(saveTimePlay, 30*1000); */
+	};
+	
+    //]]>
+</script>
+		<p:growl id="growlPlan" showDetail="true" sticky="false" />
+		<h:form id="formdataassign">
+			<p:commandButton ajax="false" value="xem" style="display:none"
+				onclick="this.form.target='_blank'" id="process"
+				action="#{infoCourseBean.showPDFData()}" />
+			<p:commandButton ajax="false" value="xem" style="display:none"
+				type="submit" onclick="this.form.target='_blank'" id="report"
+				action="#{kPIPersonBean.printOnly()}" />
+		</h:form>
+		<div class="ui-g">
+			<div class="ui-g-4">
+				<h:form id="tab2">
+					<p:dataTable var="item2" selectionMode="single"
+						selection="#{infoCourseBean.skillDetailSelected}"
+						value="#{infoCourseBean.skillDetailsBySkill}"
+						rowsPerPageTemplate="10,25,50" scrollable="true" paginator="true"
+						paginatorPosition="bottom" tyleClass="tableformat1"
+						scrollHeight="100%" rowKey="#{item2.id}" id="dtSkillDetail"
+						style="width:100%;height:328px;margin-bottom:30px;margin-top:20px"
+						rowIndexVar="rowIndex">
+						<p:ajax event="rowSelect"
+							listener="#{infoCourseBean.skillDetailOnRowSelect()}"
+							update="tab3" />
+						<p:column headerText="" style="width:10%;text-align:center">
+							<h:outputText value="#{rowIndex+1}" />
+						</p:column>
+
+						<p:column headerText="Mục lục" style="width:90%">
+							<h:outputText value="#{item2.name}" />
+						</p:column>
+						<f:facet name="footer">
+							<div style="clear: both;" />
+						</f:facet>
+					</p:dataTable>
+				</h:form>
+			</div>
+			<div class="ui-g-8">
+				<h:form id="tab3" style="text-align:center">
+					<h3 style="margin-bottom: 20px">#{infoCourseBean.skillDetailSelected.name}</h3>
+					<b:row style="margin-top: 20px;width:100%">
+						<b:video id="myVideo"
+							src="../../resources/videos/#{infoCourseBean.pathVideo}"
+							style="width:100%;margin-left:41px" onplay="playVideo()"
+							onpause="ajax:infoCourseBean.onPause()"
+							oncanplaythrough="ajax:infoCourseBean.onCanplaythrough()"
+							onseeking="ajax:infoCourseBean.onSeeking()">
+						</b:video>
+					</b:row>
+					<br />
+					<br />
+					<h4 style="text-align: center">Tài liệu tham khảo</h4>
+					<p:separator style="width:30%;margin-top:0px" />
+					<p:commandLink value="Xem file (PDF)" process="@this" id="ancdfa"
+						style="font-size: 15px;text-decoration: none;font-style: italic;margin:0 auto"
+						actionListener="#{infoCourseBean.processDataAssign()}" />
+					<p:remoteCommand name="saveTimePlay"
+						actionListener="#{infoCourseBean.onPlay()}" style="display: none;" />
+				</h:form>
+			</div>
+		</div>
+		<form id="exit">
+			<p:remoteCommand id="testExit" name="test"
+				action="#{infoCourseBean.onPause}" />
+		</form>
+		<br />
+	</ui:define>
+</ui:composition>

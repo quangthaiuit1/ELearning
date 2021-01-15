@@ -3,6 +3,7 @@ package trong.lixco.com.bean.elearning;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.Date;
 import java.util.List;
 
 import javax.faces.context.ExternalContext;
@@ -94,6 +95,12 @@ public class CourseEmployeeDetailBean extends AbstractBean<Course> {
 					if (!ts.isEmpty()) {
 						pdSkillsByPD.get(i).setSuccess(true);
 					}
+					// kiem tra khoa hoc da het han hay chua
+					Date currentDate = new Date();
+					if (currentDate.after(pdSkillsByPD.get(i).getPlan_detail().getEnd_time())
+							|| currentDate.before(pdSkillsByPD.get(i).getPlan_detail().getStart_time())) {
+						pdSkillsByPD.get(i).setExpired(true);
+					}
 				}
 			} else {
 				return;
@@ -112,16 +119,24 @@ public class CourseEmployeeDetailBean extends AbstractBean<Course> {
 		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext()
 				.getRequest();
 		String setofIdTemp = request.getParameter("pdid");
-		if (setofIdTemp.equals("null")) {
+		if (setofIdTemp == null || setofIdTemp.equals("null")) {
 			return 0;
 		}
 		return Long.parseLong(setofIdTemp);
 	}
 
 	public void skillOnRowSelect() {
+		// skillDetailsBySkill =
+		// SKILL_DETAIL_SERVICE.findBySkill(pdSkillSelected.getSkill().getId());
 		try {
-			skillDetailsBySkill = SKILL_DETAIL_SERVICE.findBySkill(pdSkillSelected.getSkill().getId());
-		} catch (Exception e) {
+			FacesContext fContext = FacesContext.getCurrentInstance();
+			ExternalContext extContext = fContext.getExternalContext();
+			HttpServletRequest ht = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext()
+					.getRequest();
+			String path = "http://" + ht.getServerName() + ":" + ht.getServerPort()
+					+ "/elearning/pages/nhanvien/thongtinkhoahoc.htm?pdsid=" + pdSkillSelected.getSkill().getId();
+			extContext.redirect(path);
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
@@ -140,26 +155,27 @@ public class CourseEmployeeDetailBean extends AbstractBean<Course> {
 		}
 	}
 
-	public void handleAVGCourse() {
-		double totalScore = 0;
-		List<PlanDetailSkill> pdsByPD = PlAN_DETAIL_SKILL_SERVICE.findBySkillAndPlanDetail(0, idPlanDetail);
-		if (!pdsByPD.isEmpty() && pdsByPD != null) {
-			for (PlanDetailSkill p : pdsByPD) {
-				totalScore = totalScore + p.getScore();
-			}
-			avgCourse = totalScore / (double) pdsByPD.size();
-			PlanDetail pd = pdsByPD.get(0).getPlan_detail();
-			pd.setAvg_score(avgCourse);
-			PlanDetail p = PLAN_DETAIL_SERVICE.update(pd);
-			if (p != null && p.getId() != null) {
-				MessageView.INFO("Thành công");
-				return;
-			} else {
-				MessageView.ERROR("Lỗi");
-				return;
-			}
-		}
-	}
+	// public void handleAVGCourse() {
+	// double totalScore = 0;
+	// List<PlanDetailSkill> pdsByPD =
+	// PlAN_DETAIL_SKILL_SERVICE.findBySkillAndPlanDetail(0, idPlanDetail);
+	// if (!pdsByPD.isEmpty() && pdsByPD != null) {
+	// for (PlanDetailSkill p : pdsByPD) {
+	// totalScore = totalScore + p.getScore();
+	// }
+	// avgCourse = totalScore / (double) pdsByPD.size();
+	// PlanDetail pd = pdsByPD.get(0).getPlan_detail();
+	// pd.setAvg_score(avgCourse);
+	// PlanDetail p = PLAN_DETAIL_SERVICE.update(pd);
+	// if (p != null && p.getId() != null) {
+	// MessageView.INFO("Thành công");
+	// return;
+	// } else {
+	// MessageView.ERROR("Lỗi");
+	// return;
+	// }
+	// }
+	// }
 
 	public void saveOrUpdateTab3() {
 
