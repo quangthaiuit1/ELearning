@@ -87,19 +87,21 @@ public class CourseEmployeeDetailBean extends AbstractBean<Course> {
 
 			if (idPlanDetail != 0) {
 				pdPlaying = PLAN_DETAIL_SERVICE.findById(idPlanDetail);
-				avgCourse = pdPlaying.getAvg_score();
-				pdSkillsByPD = PlAN_DETAIL_SKILL_SERVICE.findBySkillAndPlanDetail(0, idPlanDetail);
-				// kiem tra thu bai test nao da hoan thanh
-				for (int i = 0; i < pdSkillsByPD.size(); i++) {
-					List<TestResult> ts = TEST_RESULT_SERVICE.findByPDSId(pdSkillsByPD.get(i).getId());
-					if (!ts.isEmpty()) {
-						pdSkillsByPD.get(i).setSuccess(true);
-					}
-					// kiem tra khoa hoc da het han hay chua
-					Date currentDate = new Date();
-					if (currentDate.after(pdSkillsByPD.get(i).getPlan_detail().getEnd_time())
-							|| currentDate.before(pdSkillsByPD.get(i).getPlan_detail().getStart_time())) {
-						pdSkillsByPD.get(i).setExpired(true);
+				if (pdPlaying != null) {
+					avgCourse = pdPlaying.getAvg_score();
+					pdSkillsByPD = PlAN_DETAIL_SKILL_SERVICE.findBySkillAndPlanDetail(0, idPlanDetail);
+					// kiem tra thu bai test nao da hoan thanh
+					for (int i = 0; i < pdSkillsByPD.size(); i++) {
+						List<TestResult> ts = TEST_RESULT_SERVICE.findByPDSId(pdSkillsByPD.get(i).getId());
+						if (!ts.isEmpty()) {
+							pdSkillsByPD.get(i).setSuccess(true);
+						}
+						// kiem tra khoa hoc da het han hay chua
+						Date currentDate = new Date();
+						if (currentDate.after(pdSkillsByPD.get(i).getPlan_detail().getEnd_time())
+								|| currentDate.before(pdSkillsByPD.get(i).getPlan_detail().getStart_time())) {
+							pdSkillsByPD.get(i).setExpired(true);
+						}
 					}
 				}
 			} else {
@@ -119,7 +121,7 @@ public class CourseEmployeeDetailBean extends AbstractBean<Course> {
 		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext()
 				.getRequest();
 		String setofIdTemp = request.getParameter("pdid");
-		if (setofIdTemp == null || setofIdTemp.equals("null")) {
+		if (setofIdTemp == null || setofIdTemp.equals("null") || setofIdTemp.equals("")) {
 			return 0;
 		}
 		return Long.parseLong(setofIdTemp);

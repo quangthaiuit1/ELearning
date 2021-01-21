@@ -87,11 +87,11 @@ public class MenuBean extends AbstractBean<AbstractEntity> {
 						.getSession(false);
 				Boolean isMobile = (Boolean) session.getAttribute("isMobile");
 				// khong phai mobile
-				if (!isMobile && !menus.get(i).getUrl().equals("/elearning/pages/dangkycommobile.htm")) {
+				if (!isMobile && !menus.get(i).getUrl().equals("/elearning/pages/dskhoahoc.htm")) {
 					menusTemp.add(menus.get(i));
 				}
 				// mobile
-				if (isMobile && !menus.get(i).getUrl().equals("/elearning/pages/dangkycom.htm")) {
+				if (isMobile && !menus.get(i).getUrl().equals("/elearning/pages/dskhoahoc.htm")) {
 					menusTemp.add(menus.get(i));
 				}
 			}

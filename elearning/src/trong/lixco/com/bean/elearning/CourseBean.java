@@ -147,7 +147,7 @@ public class CourseBean extends AbstractBean<Course> {
 		}
 		courseNew.setCourse_type(courseTypeSelected);
 		// check khoa hoc trung ten
-		if (StringUtils.isEmpty(courseNew.getName())) {
+		if (courseNew.getName().trim().isEmpty() || courseNew.getTime() == 0) {
 			MessageView.WARN("Vui lòng điền đầy dủ thông tin");
 			return;
 		}
@@ -249,6 +249,7 @@ public class CourseBean extends AbstractBean<Course> {
 				if (courseSelected != null) {
 					skillsByCourse = SKILL_SERVICE.findByCourse(courseSelected.getId());
 				}
+				skillNew = new Skill();
 				MessageView.INFO("Thành công");
 				return;
 			}
@@ -425,8 +426,15 @@ public class CourseBean extends AbstractBean<Course> {
 			// Tao outputstream -> new doi tuong xong truyen duong dan +
 			// fileName
 			String filename = System.currentTimeMillis() + "-" + skillDetailSelected.getId() + ".mp4";
-			OutputStream out = new FileOutputStream(
-					new File(STORAGE_PATH_SERVICE.findByName("video").getPath() + filename));
+
+			String url = FacesContext.getCurrentInstance().getExternalContext().getRealPath("/resources/videos/")
+					+ "\\";
+			// OutputStream out = new FileOutputStream(
+			// new File(STORAGE_PATH_SERVICE.findByName("video").getPath() +
+			// filename));
+			// System.out.println(url);
+			OutputStream out = new FileOutputStream(new File(url + filename));
+
 			int read = 0;
 			byte[] bytes = new byte[1024];
 
@@ -488,6 +496,48 @@ public class CourseBean extends AbstractBean<Course> {
 		// } else {
 		// MessageView.ERROR("Tài khoản không có quyền thực hiện.");
 		// }
+	}
+
+	public void updateDataVideoNew(FileUploadEvent event) {
+		notify = new Notify(FacesContext.getCurrentInstance());
+
+		try {
+			InputStream in = event.getFile().getInputstream();
+			// Ghi inputStream vao 1 OutputStream
+			// Tao outputstream -> new doi tuong xong truyen duong dan +
+			// fileName
+			String filename = System.currentTimeMillis() + "-" + skillDetailSelected.getId() + ".mp4";
+
+			// String url =
+			// FacesContext.getCurrentInstance().getExternalContext().getRealPath("/resources/videos/")
+			// + "\\";
+			OutputStream out = new FileOutputStream(
+					new File(STORAGE_PATH_SERVICE.findByName("video").getPath() + filename));
+			// System.out.println(url);
+
+			int read = 0;
+			byte[] bytes = new byte[1024];
+
+			while ((read = in.read(bytes)) != -1) {
+				out.write(bytes, 0, read);
+			}
+
+			in.close();
+			out.flush();
+			out.close();
+			System.err.println("New file created!");
+
+			skillDetailSelected.setFile_video(filename);
+			skillDetailSelected = SKILL_DETAIL_SERVICE.update(skillDetailSelected);
+			PrimeFaces.current().executeScript("PF('dialogDataVideo').hide();");
+			notice("Tải lên thành công.");
+
+		} catch (IOException e) {
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+			MessageView.ERROR("Không lưu được. Dữ liệu vượt quá dung lượng");
+		}
+
 	}
 
 	public void showPDFData() throws IOException {

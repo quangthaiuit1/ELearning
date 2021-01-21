@@ -71,14 +71,6 @@ legend.ui-fieldset-legend.ui-corner-all.ui-state-default {
     //]]>
 </script>
 		<p:growl id="growlPlan" showDetail="true" sticky="false" />
-		<h:form id="formdataassign">
-			<p:commandButton ajax="false" value="xem" style="display:none"
-				onclick="this.form.target='_blank'" id="process"
-				action="#{courseEmployeeDetailBean.showPDFData()}" />
-			<p:commandButton ajax="false" value="xem" style="display:none"
-				type="submit" onclick="this.form.target='_blank'" id="report"
-				action="#{kPIPersonBean.printOnly()}" />
-		</h:form>
 		<h:form id="tab1">
 			<p:fieldset legend="Điểm trung bình khóa học"
 				style="width:25%;margin: 0 auto;font-weight:normal"

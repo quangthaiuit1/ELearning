@@ -2,6 +2,7 @@ package trong.lixco.com.bean.elearning;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -20,6 +21,7 @@ import trong.lixco.com.account.servicepublics.MemberServicePublicProxy;
 import trong.lixco.com.bean.AbstractBean;
 import trong.lixco.com.bean.entities.PositionJobData;
 import trong.lixco.com.bean.entities.PositionJobDataService;
+import trong.lixco.com.bean.staticentity.DateUtil;
 import trong.lixco.com.bean.staticentity.MessageView;
 import trong.lixco.com.ejb.service.elearning.CoursePositionJobService;
 import trong.lixco.com.ejb.service.elearning.CourseService;
@@ -76,25 +78,42 @@ public class CoursePlanBean extends AbstractBean<Course> {
 	@Override
 	protected void initItem() {
 		try {
+			yearSearch = Calendar.getInstance().get(Calendar.YEAR);
 			EMPLOYEE_SERVICE_PUBLIC = new EmployeeServicePublicProxy();
 			departmentServicePublic = new DepartmentServicePublicProxy();
 			memberServicePublic = new MemberServicePublicProxy();
 			member = getAccount().getMember();
 			departmentSearchs = new ArrayList<Department>();
-			if (getAccount().isAdmin()) {
-				Department[] deps = departmentServicePublic.findAll();
-				for (int i = 0; i < deps.length; i++) {
-					if (deps[i].getLevelDep() != null)
-						if (deps[i].getLevelDep().getLevel() > 1)
-							departmentSearchs.add(deps[i]);
-				}
-
-			} else {
-				departmentSearchs.add(member.getDepartment());
+			// if (getAccount().isAdmin()) {
+			Department[] deps = departmentServicePublic.findAll();
+			for (int i = 0; i < deps.length; i++) {
+				if (deps[i].getLevelDep() != null)
+					if (deps[i].getLevelDep().getLevel() > 1)
+						departmentSearchs.add(deps[i]);
 			}
+
+			// } else {
+			// departmentSearchs.add(member.getDepartment());
+			// }
 			if (departmentSearchs.size() != 0) {
 				departmentSearchs = DepartmentUtil.sort(departmentSearchs);
 				departmentSelected = departmentSearchs.get(0);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void ajaxHandleEndDate(PlanDetail item) {
+		try {
+			// tim kiem va set ngay ket thuc
+			for (int i = 0; i < detailsByPlan.size(); i++) {
+				if (detailsByPlan.get(i).getId() == item.getId()) {
+					// tinh ngay ket thuc
+					detailsByPlan.get(i)
+							.setEnd_time(DateUtil.addDays(item.getStart_time(), item.getCourse().getTime()));
+					break;
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

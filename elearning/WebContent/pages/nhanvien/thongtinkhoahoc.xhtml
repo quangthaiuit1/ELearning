@@ -84,6 +84,26 @@ legend.ui-fieldset-legend.ui-corner-all.ui-state-default {
 				action="#{kPIPersonBean.printOnly()}" />
 		</h:form>
 		<div class="ui-g">
+			<div class="ui-g-8">
+				<h:form id="tab3" style="text-align:center">
+					<h3 style="margin-bottom: 20px">#{infoCourseBean.skillDetailSelected.name}</h3>
+					<video controls="controls" id="myVideo" onplay="playVideo()"
+						onplaying="onPlayingVideo()" onpause="stopVideo()"
+						style="width: 100%">
+						<source src="../../resources/videos/#{infoCourseBean.pathVideo}"
+							type="video/mp4"></source>
+					</video>
+					<br />
+					<br />
+					<h4 style="text-align: center">Tài liệu tham khảo</h4>
+					<p:separator style="width:30%;margin-top:0px" />
+					<p:commandLink value="Xem file (PDF)" process="@this" id="ancdfa"
+						style="font-size: 15px;text-decoration: none;font-style: italic;margin:0 auto"
+						actionListener="#{infoCourseBean.processDataAssign()}" />
+					<p:remoteCommand name="saveTimePlay"
+						actionListener="#{infoCourseBean.onPlay()}" style="display: none;" />
+				</h:form>
+			</div>
 			<div class="ui-g-4">
 				<h:form id="tab2">
 					<p:dataTable var="item2" selectionMode="single"
@@ -110,34 +130,31 @@ legend.ui-fieldset-legend.ui-corner-all.ui-state-default {
 					</p:dataTable>
 				</h:form>
 			</div>
-			<div class="ui-g-8">
-				<h:form id="tab3" style="text-align:center">
-					<h3 style="margin-bottom: 20px">#{infoCourseBean.skillDetailSelected.name}</h3>
-					<b:row style="margin-top: 20px;width:100%">
-						<b:video id="myVideo"
-							src="../../resources/videos/#{infoCourseBean.pathVideo}"
-							style="width:100%;margin-left:41px" onplay="playVideo()"
-							onpause="ajax:infoCourseBean.onPause()"
-							oncanplaythrough="ajax:infoCourseBean.onCanplaythrough()"
-							onseeking="ajax:infoCourseBean.onSeeking()">
-						</b:video>
-					</b:row>
-					<br />
-					<br />
-					<h4 style="text-align: center">Tài liệu tham khảo</h4>
-					<p:separator style="width:30%;margin-top:0px" />
-					<p:commandLink value="Xem file (PDF)" process="@this" id="ancdfa"
-						style="font-size: 15px;text-decoration: none;font-style: italic;margin:0 auto"
-						actionListener="#{infoCourseBean.processDataAssign()}" />
-					<p:remoteCommand name="saveTimePlay"
-						actionListener="#{infoCourseBean.onPlay()}" style="display: none;" />
-				</h:form>
-			</div>
+
 		</div>
 		<form id="exit">
 			<p:remoteCommand id="testExit" name="test"
 				action="#{infoCourseBean.onPause}" />
 		</form>
 		<br />
+		<script type="text/javascript">
+		    //<![CDATA[
+			function playVideo(){
+
+			}
+
+
+			var myVar;
+			
+			function onPlayingVideo(){
+				
+			}
+
+			function stopVideo(){
+				clearInterval(myVar);
+			}
+			
+		    //]]>
+		</script>
 	</ui:define>
 </ui:composition>

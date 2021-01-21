@@ -187,8 +187,7 @@
 									<h:outputText value="#{rowIndex+1}" />
 								</p:column>
 
-								<p:column headerText="Kĩ năng"
-									style="width:50%;text-align:center">
+								<p:column headerText="Kĩ năng" style="width:50%;">
 									<h:outputText value="#{item2.name}" />
 								</p:column>
 								<p:column headerText="Mô tả"
@@ -314,10 +313,6 @@
 										<p:growl id="messagesh" showDetail="true" />
 									</h:form>
 									<!-- end upload -->
-									<p:commandButton style="width:195px;margin-left:33%"
-										styleClass="btsave" type="submit"
-										value="Cài đặt điểm từng phần"
-										oncomplete="PF('wgvCreateScore').show();" icon="fa fa-cog" />
 									<p:linkButton icon="fa fa-plus" styleClass="btadd"
 										outcome="taocauhoi" value="Tạo câu hỏi mới">
 										<f:param name="sid" value="#{courseBean.skillSelected.id}" />
@@ -392,22 +387,17 @@
 					<br />
 					<p:commandLink value="Tải lên (file .mp4)" style="font-size:14px"
 						oncomplete="PF('dialogDataVideo').show();" process="@this" />
-					<b:row style="margin-top: 20px">
-						<b:video small-screen="two-thirds"
-							src="../resources/videos/#{courseBean.pathVideo}"
-							style="width:100%" onplay="ajax:courseBean.onPlay()"
-							onpause="ajax:courseBean.onPause()"
-							onloadeddata="ajax:courseBean.onLoadeddataNew()"
-							oncanplaythrough="ajax:courseBean.onCanplaythrough()"
-							onseeking="ajax:courseBean.onSeeking()">
-						</b:video>
-					</b:row>
+					<br />
+					<video controls="controls" style="width: 60%; margin-top: 15px">
+						<source src="../resources/videos/#{courseBean.pathVideo}"
+							type="video/mp4"></source>
+					</video>
 				</h:form>
 			</p:tab>
 		</p:tabView>
 		<br />
 		<p:dialog widgetVar="dialogDataAssign" modal="true" resizable="false"
-			width="400" closeOnEscape="true" header="Dữ liệu chứng minh">
+			width="400" closeOnEscape="true" header="Tài liệu">
 			<h:form id="bg" enctype="multipart/form-data">
 				<p:fileUpload style="text-align:center" update="tv,growlCourse"
 					id="fileupload" dragDropSupport="true" allowTypes="/(\.|\/)(pdf)$/"
@@ -431,7 +421,7 @@
 		</p:dialog>
 
 		<p:dialog widgetVar="dialogDataVideo" modal="true" resizable="false"
-			width="400" closeOnEscape="true" header="Dữ liệu chứng minh">
+			width="400" closeOnEscape="true" header="Tài liệu">
 			<h:form id="bg1" enctype="multipart/form-data">
 				<p:fileUpload style="text-align:center" update="tv,growlCourse"
 					id="videoUpload" dragDropSupport="true"
@@ -459,12 +449,17 @@
 			<h:form id="formCreateCourse">
 				<h:outputText value="Tên:" style="font-weight:bold" />
 				<p:inputTextarea placeholder="Tên khóa học"
-					value="#{courseBean.courseNew.name}" />
+					value="#{courseBean.courseNew.name}" style="margin-bottom:20px" />
 				<h:outputText value="Giới thiệu:"
 					style="font-weight:bold ;margin-top: 15px" />
 				<p:inputTextarea placeholder="Mô tả chi tiết:"
 					value="#{courseBean.courseNew.description}"
-					style="margin-top:5px;min-height:150px" />
+					style="margin-top:5px;min-height:150px;margin-bottom:20px" />
+				<br />
+				<h:outputText value="Thời lượng khóa học:"
+					style="font-weight:bold;margin-top:15px" />
+				<p:spinner id="spinnerTime" value="#{courseBean.courseNew.time}"
+					min="0" max="365" />
 				<br />
 				<br />
 				<center>
@@ -490,7 +485,13 @@
 					style="font-weight:bold ;margin-top: 15px" />
 				<p:inputTextarea placeholder="Mô tả chi tiết:"
 					value="#{courseBean.courseUpdate.description}"
-					style="margin-top:5px;min-height:150px" />
+					style="margin-top:5px;min-height:150px;margin-bottom:15px" />
+
+				<br />
+				<h:outputText value="Thời lượng khóa học:"
+					style="font-weight:bold;margin-top:15px" />
+				<p:spinner id="spinnerTimeUpdate"
+					value="#{courseBean.courseUpdate.time}" min="0" max="365" />
 				<br />
 				<br />
 				<center>

@@ -178,6 +178,14 @@
 			<div class="bgheader">
 				<div class="wrapper"
 					style="background-color: none !important; color: white">
+					<div class="logo">
+						<p:commandLink action="#{applicationBean.logoutHome()}">
+							<img src="#{request.contextPath}/resources/gfx/lixco_logo.png"
+								style="width: 100px; height: 50px; border-radius: 2px" />
+							<span style="color: white; font-weight: bold; font-size: 12px;">
+								#{sessionScope.database} </span>
+						</p:commandLink>
+					</div>
 					<div class="main_menu">
 						<ul>
 							<li><a href="#" style="color: white"><i

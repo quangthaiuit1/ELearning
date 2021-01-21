@@ -218,12 +218,10 @@
 									<h:outputText value="#{rowIndex+1}" />
 								</p:column>
 
-								<p:column headerText="Tên khóa học"
-									style="width:25%;">
+								<p:column headerText="Tên khóa học" style="width:25%;">
 									<h:outputText value="#{item4.name}" />
 								</p:column>
-								<p:column headerText="Mô tả"
-									style="width:55%;">
+								<p:column headerText="Mô tả" style="width:55%;">
 									<h:outputText value="#{item4.description}" />
 								</p:column>
 
@@ -253,12 +251,10 @@
 								<p:column headerText="STT" style="width:10%;text-align:center">
 									<h:outputText value="#{rowIndex+1}" />
 								</p:column>
-								<p:column headerText="Tên khóa học"
-									style="width:25%;">
+								<p:column headerText="Tên khóa học" style="width:25%;">
 									<h:outputText value="#{item6.name}" />
 								</p:column>
-								<p:column headerText="Mô tả"
-									style="width:55%;">
+								<p:column headerText="Mô tả" style="width:55%;">
 									<h:outputText value="#{item6.description}" />
 								</p:column>
 
@@ -293,8 +289,7 @@
 							<h:outputText value="#{rowIndex+1}" />
 						</p:column>
 
-						<p:column headerText="Tên khóa học"
-							style="width:25%;">
+						<p:column headerText="Tên khóa học" style="width:25%;">
 							<h:outputText value="#{item5.course.name}" />
 						</p:column>
 						<p:column headerText="Mô tả" style="width:45%; text-align:center">
@@ -305,13 +300,16 @@
 								value="#{item5.start_time}" id="startDate"
 								pattern="#{applicationBean.cf.formatDate}"
 								showButtonPanel="true" navigator="true"
-								mask="#{applicationBean.cf.maskDate}" />
+								mask="#{applicationBean.cf.maskDate}">
+								<p:ajax event="dateSelect"
+									listener="#{coursePlanBean.ajaxHandleEndDate(item5)}"
+									update="dtDetailByPlan" />
+							</p:calendar>
 						</p:column>
 						<p:column headerText="Ngày kết thúc" style="width:10%">
-							<p:calendar styleClass="stwidth" value="#{item5.end_time}"
-								locale="vi" pattern="#{applicationBean.cf.formatDate}"
-								id="endDate" showButtonPanel="true" navigator="true"
-								mask="#{applicationBean.cf.maskDate}" />
+							<h:outputText value="#{item5.end_time}">
+								<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
+							</h:outputText>
 						</p:column>
 
 						<f:facet name="footer">

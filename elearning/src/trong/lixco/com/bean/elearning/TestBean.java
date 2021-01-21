@@ -142,6 +142,9 @@ public class TestBean extends AbstractBean {
 
 	public void submitTest() {
 		try {
+			if (answersResp == null) {
+				return;
+			}
 			for (int i = 1; i < answersResp.length; i++) {
 				if (answersResp[i] == null) {
 					MessageView.ERROR("Vui lòng hoàn thành toàn bộ bài thi");
@@ -175,7 +178,7 @@ public class TestBean extends AbstractBean {
 
 			double sodiem = ((double) 10 / (double) qAndAnswers.size()) * (double) socaudung;
 			p.setScore_tracnghiem(sodiem);
-			p.setScore_total(sodiem);
+			// p.setScore_total(sodiem);
 			PlanDetailSkill pds = PLAN_DETAIL_SKILL_SERVICE.update(p);
 			if (pds != null && pds.getId() != null) {
 				redirectTo(pds.getPlan_detail().getId());
@@ -184,7 +187,7 @@ public class TestBean extends AbstractBean {
 				List<PlanDetailSkill> pdss = PLAN_DETAIL_SKILL_SERVICE.findBySkillAndPlanDetail(0,
 						pds.getPlan_detail().getId());
 				for (PlanDetailSkill s : pdss) {
-					totalScore = totalScore + s.getScore_total();
+					totalScore = totalScore + s.getScore_tracnghiem();
 				}
 				double avg = totalScore / (double) pdss.size();
 				PlanDetail pd = pds.getPlan_detail();

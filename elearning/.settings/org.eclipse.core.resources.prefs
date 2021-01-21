@@ -80,7 +80,6 @@ encoding//src/trong/lixco/com/account/servicepublics/UserRightServicePublicServi
 encoding//src/trong/lixco/com/account/servicepublics/UserRightServicePublicServiceLocator.java=UTF-8
 encoding//src/trong/lixco/com/account/servicepublics/UserRightServicePublicServiceSoapBindingStub.java=UTF-8
 encoding//src/trong/lixco/com/bean/AbstractBean.java=UTF-8
-encoding//src/trong/lixco/com/bean/CaiDatDanhMucBean.java=UTF-8
 encoding//src/trong/lixco/com/bean/CommonService.java=UTF-8
 encoding//src/trong/lixco/com/bean/entities/ConnectivityFinger.java=UTF-8
 encoding//src/trong/lixco/com/bean/entities/EmployeeData.java=UTF-8

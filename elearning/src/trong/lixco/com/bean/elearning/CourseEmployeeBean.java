@@ -30,11 +30,15 @@ import trong.lixco.com.bean.staticentity.MessageView;
 import trong.lixco.com.ejb.service.elearning.CoursePositionJobService;
 import trong.lixco.com.ejb.service.elearning.CourseService;
 import trong.lixco.com.ejb.service.elearning.PlanDetailService;
+import trong.lixco.com.ejb.service.elearning.PlanDetailSkillService;
 import trong.lixco.com.ejb.service.elearning.PlanService;
+import trong.lixco.com.ejb.service.elearning.SkillService;
 import trong.lixco.com.jpa.entities.Course;
 import trong.lixco.com.jpa.entities.CoursePositionJob;
 import trong.lixco.com.jpa.entities.Plan;
 import trong.lixco.com.jpa.entities.PlanDetail;
+import trong.lixco.com.jpa.entities.PlanDetailSkill;
+import trong.lixco.com.jpa.entities.Skill;
 import trong.lixco.com.servicepublic.EmployeeDTO;
 import trong.lixco.com.servicepublic.EmployeeServicePublic;
 import trong.lixco.com.servicepublic.EmployeeServicePublicProxy;
@@ -72,13 +76,17 @@ public class CourseEmployeeBean extends AbstractBean<Course> {
 	private CourseService COURSE_SERVICE;
 	@Inject
 	private PlanDetailService PLAN_DETAIL_SERVICE;
+	@Inject
+	private SkillService SKILL_SERVICE;
+	@Inject
+	private PlanDetailSkillService PLAN_DETAIL_SKILL_SERVICE;
 
 	@Override
 	protected void initItem() {
 		try {
-			EMPLOYEE_SERVICE_PUBLIC = new EmployeeServicePublicProxy();
+			// EMPLOYEE_SERVICE_PUBLIC = new EmployeeServicePublicProxy();
 			departmentServicePublic = new DepartmentServicePublicProxy();
-			memberServicePublic = new MemberServicePublicProxy();
+			// memberServicePublic = new MemberServicePublicProxy();
 			member = getAccount().getMember();
 			departmentSearchs = new ArrayList<Department>();
 			if (getAccount().isAdmin()) {
@@ -99,14 +107,14 @@ public class CourseEmployeeBean extends AbstractBean<Course> {
 			yearSearch = Calendar.getInstance().get(Calendar.YEAR);
 			searchItem();
 			allCourse = COURSE_SERVICE.findAll();
-			//tim khoa hoc sap dien ra
-			
+			// tim khoa hoc sap dien ra
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void handleComingCourses(List<Course> allCourse){
+	public void handleComingCourses(List<Course> allCourse) {
 		// Date currentDate = new Date();
 		// for(Course c : allCourse){
 		// if(currentDate.before(c.getStart_date())){
@@ -114,7 +122,7 @@ public class CourseEmployeeBean extends AbstractBean<Course> {
 		// }
 		// }
 	}
-	
+
 	public void planShowEdit() {
 		// tim vi tri chuc danh theo nhan vien duoc chon
 		positionsByEmpl = PositionJobDataService.vttheonhanvien(planSelected.getEmployee_code());
@@ -208,13 +216,13 @@ public class CourseEmployeeBean extends AbstractBean<Course> {
 	public void create() {
 		try {
 			// toan bo nhan vien nhom khac
-			List<EmployeeDTO> allMemberOther = new ArrayList<>();
 			EmployeeDTO[] allMemberTemp;
 			List<String> depList = new ArrayList<>();
 			String[] depArray = null;
 			// Phong ban
 			depList.add(departmentSelected.getCode());
 			depArray = depList.toArray(new String[depList.size()]);
+			EMPLOYEE_SERVICE_PUBLIC = new EmployeeServicePublicProxy();
 			allMemberTemp = EMPLOYEE_SERVICE_PUBLIC.findByDep(depArray);
 			if (allMemberTemp != null) {
 				// tat ca nhan vien
@@ -257,7 +265,17 @@ public class CourseEmployeeBean extends AbstractBean<Course> {
 							if (allCourse.get(i).getStart_date() != null && allCourse.get(i).getEnd_date() != null) {
 								pd = new PlanDetail(allCourse.get(i), plansByDepart.get(0),
 										allCourse.get(i).getStart_date(), allCourse.get(i).getEnd_date());
-								PLAN_DETAIL_SERVICE.create(pd);
+								pd = PLAN_DETAIL_SERVICE.create(pd);
+								// tao toan bo ki nang theo khoa hoc
+								List<Skill> skillsByCourseTemp = SKILL_SERVICE.findByCourse(allCourse.get(i).getId());
+								for (Skill s : skillsByCourseTemp) {
+									PlanDetailSkill pds = new PlanDetailSkill();
+									pds.setSkill(s);
+									pds.setPlan_detail(pd);
+									pds.setCreatedDate(new Date());
+									pds.setCreatedUser(member.getCode());
+									PLAN_DETAIL_SKILL_SERVICE.create(pds);
+								}
 							}
 							// khong co ngay bat dau
 							else {

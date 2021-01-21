@@ -176,11 +176,11 @@
 								mask="#{applicationBean.cf.maskDate}">
 								<p:ajax event="dateSelect"
 									listener="#{courseEmployeeBean.ajaxHandleEndDate(item1)}"
-									update="dtDKThem" />
+									update="outputtextEndDate" />
 							</p:calendar>
 						</p:column>
 						<p:column headerText="Ngày kết thúc" style="width:100px">
-							<h:outputText value="#{item1.end_date}">
+							<h:outputText value="#{item1.end_date}" id="outputtextEndDate">
 								<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
 							</h:outputText>
 						</p:column>
