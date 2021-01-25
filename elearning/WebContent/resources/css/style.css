@@ -28,11 +28,10 @@ body {
 }
 
 .hidenbutton {
-	background:
+	 /* background:
 		url("#{resource['primefaces-extensions:layout/toggle-up.gif']}")
 		no-repeat scroll top center transparent;
-	margin: auto;
-}
+	margin: auto; */}
 
 .showbutton {
 	display: none;

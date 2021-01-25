@@ -125,8 +125,7 @@ public class ApplicationBean implements Serializable {
 			e.printStackTrace();
 		}
 	}
-	
-	
+
 	// Doi mat khau
 	public void changePassword() {
 		notify = new Notify(FacesContext.getCurrentInstance());
@@ -151,7 +150,7 @@ public class ApplicationBean implements Serializable {
 
 	// Hien thi thong bao he thong
 	public void showNoticeSystem() {
-		
+
 		if (account != null) {
 			try {
 				account.setNotice(false);
@@ -161,8 +160,8 @@ public class ApplicationBean implements Serializable {
 			}
 			try {
 				MemNoticeRela[] memNoticeRelas = memNoticeRelaServicePublic.findByMember(account.getMember());
-				DepartNoticeRela[] departNoticeRelas = departNoticeRelaServicePublic.findByDepartment(account
-						.getMember().getDepartment());
+				DepartNoticeRela[] departNoticeRelas = departNoticeRelaServicePublic
+						.findByDepartment(account.getMember().getDepartment());
 
 				noticeSystems = new ArrayList<NoticeSystem>();
 				if (departNoticeRelas != null)
@@ -190,7 +189,7 @@ public class ApplicationBean implements Serializable {
 
 	// Kiem tra co thong bao
 	public void checkNotice() {
-		
+
 		try {
 			Account acc = accountServicePublic.findById(account.getId());
 			if (acc.isNotice()) {
@@ -200,14 +199,13 @@ public class ApplicationBean implements Serializable {
 		}
 	}
 
-
 	// Dang xuat
 	public void logout() {
 		try {
 			FacesContext context = FacesContext.getCurrentInstance();
 			context.getExternalContext().invalidateSession();
 			logger.info("(" + getAccount().getUserName() + "): Đăng xuất. ");
-			context.getExternalContext().redirect(getPathLink()  + "/account/logout/");
+			context.getExternalContext().redirect(getPathLink() + "/account/logout/");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -220,8 +218,7 @@ public class ApplicationBean implements Serializable {
 			FacesContext context = FacesContext.getCurrentInstance();
 			context.getExternalContext().invalidateSession();
 			logger.info("(" + getAccount().getUserName() + "): Đăng xuất. ");
-			context.getExternalContext().redirect(
-					getPathLink() + "/account/pages/Start.jsf");
+			context.getExternalContext().redirect(getPathLink() + "/account/pages/Start.jsf");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -284,7 +281,7 @@ public class ApplicationBean implements Serializable {
 	}
 
 	public void saveSettingPerson() {
-		
+
 		notify = new Notify(FacesContext.getCurrentInstance());
 		if (account != null) {
 			trong.lixco.com.account.servicepublics.PrivateConfig privateConfig = new trong.lixco.com.account.servicepublics.PrivateConfig();
@@ -341,7 +338,7 @@ public class ApplicationBean implements Serializable {
 	}
 
 	public void saveShowHidenHeader() {
-		
+
 		notify = new Notify(FacesContext.getCurrentInstance());
 		if (account != null) {
 			trong.lixco.com.account.servicepublics.PrivateConfig privateConfig = new trong.lixco.com.account.servicepublics.PrivateConfig();
@@ -392,7 +389,7 @@ public class ApplicationBean implements Serializable {
 	}
 
 	public void setSettingPerson() {
-		
+
 		if (account == null)
 			getAccountFormSession();
 		if (account != null) {
@@ -418,7 +415,7 @@ public class ApplicationBean implements Serializable {
 	}
 
 	public void addclass() {
-		cf.setShowHeader(false);
+		cf.setShowHeader(true);
 		saveShowHidenHeader();
 		PrimeFaces.current().executeScript("addclass()");
 

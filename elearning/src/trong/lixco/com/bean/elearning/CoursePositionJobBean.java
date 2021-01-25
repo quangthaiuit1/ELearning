@@ -47,11 +47,11 @@ public class CoursePositionJobBean extends AbstractBean<CoursePositionJob> {
 	private List<PositionJob> positionsFilter;
 	private List<PositionJob> positionsSettingFilter;
 	private PositionJob positionSelected;
-	private PositionJob positionSettingSelected;
+	// private PositionJob positionSettingSelected;
 	private List<CoursePositionJob> coursePositionByPosition;
 	private List<Course> coursesByPosition;
 	private List<Course> allCourse;
-	private List<Course> coursesSelected;
+	// private List<Course> coursesSelected;
 	@Inject
 	private PositionJobService POSITION_JOB_SERVICE;
 	@Inject
@@ -76,109 +76,208 @@ public class CoursePositionJobBean extends AbstractBean<CoursePositionJob> {
 		}
 	}
 
-	public void positionJobSettingOnRowSelected() {
-		allCourse = COURSE_SERVICE.findAll();
-		coursesByPosition = new ArrayList<>();
-		coursePositionByPosition = COURSE_POSITION_JOB_SERVICE.findByPosition(positionSettingSelected.getCode());
-		if (!coursePositionByPosition.isEmpty()) {
-			for (CoursePositionJob c : coursePositionByPosition) {
-				coursesByPosition.add(c.getCourse());
-			}
-		}
-		for (int i = 0; i < allCourse.size(); i++) {
-			boolean isExist = false;
-			for (int j = 0; j < coursesByPosition.size(); j++) {
-				if (allCourse.get(i).getId() == coursesByPosition.get(j).getId()) {
-					isExist = true;
-					break;
-				}
-			}
-			if (isExist) {
-				allCourse.get(i).setSelect(true);
-			}
-		}
+	// public void positionJobSettingOnRowSelected() {
+	// allCourse = COURSE_SERVICE.findAll();
+	// coursesByPosition = new ArrayList<>();
+	// coursePositionByPosition =
+	// COURSE_POSITION_JOB_SERVICE.findByPosition(positionSettingSelected.getCode());
+	// if (!coursePositionByPosition.isEmpty()) {
+	// for (CoursePositionJob c : coursePositionByPosition) {
+	// coursesByPosition.add(c.getCourse());
+	// }
+	// }
+	// for (int i = 0; i < allCourse.size(); i++) {
+	// boolean isExist = false;
+	// for (int j = 0; j < coursesByPosition.size(); j++) {
+	// if (allCourse.get(i).getId() == coursesByPosition.get(j).getId()) {
+	// isExist = true;
+	// break;
+	// }
+	// }
+	// if (isExist) {
+	// allCourse.get(i).setSelect(true);
+	// }
+	// }
+	// }
+
+	public void saveOrUpdateBackup() {
+		// if (positionSettingSelected == null) {
+		// MessageView.WARN("Không có thay đổi");
+		// return;
+		// }
+		// coursesSelected = new ArrayList<>();
+		// for (int i = 0; i < allCourse.size(); i++) {
+		// if (allCourse.get(i).isSelect()) {
+		// coursesSelected.add(allCourse.get(i));
+		// // allCourse.get(i).setSelect(false);
+		// }
+		// }
+		// // kiem tra vi tri do da duoc tao chua
+		// List<CoursePositionJob> coursesIsExist = COURSE_POSITION_JOB_SERVICE
+		// .findByPosition(positionSettingSelected.getCode());
+		// if (coursesIsExist.isEmpty()) {
+		// // tao moi toan bo
+		// boolean isSuccess = true;
+		// for (int i = 0; i < coursesSelected.size(); i++) {
+		// // 1.position job , 2.course
+		// CoursePositionJob cpNew = new
+		// CoursePositionJob(positionSettingSelected.getCode(),
+		// coursesSelected.get(i));
+		// cpNew.setCreatedDate(new Date());
+		// cpNew.setCreatedUser(getAccount().getMember().getCode());
+		// try {
+		// cpNew = COURSE_POSITION_JOB_SERVICE.create(cpNew);
+		// } catch (Exception e) {
+		// isSuccess = false;
+		// e.printStackTrace();
+		// }
+		// }
+		// if (isSuccess) {
+		// MessageView.INFO("Thành công");
+		// } else {
+		// MessageView.ERROR("Lỗi");
+		// }
+		// }
+		// // vi tri da duoc tao -> them vi tri khoa hoc moi
+		// else {
+		// for (int i = 0; i < coursesIsExist.size(); i++) {
+		// boolean exist = false;
+		// for (int j = 0; j < coursesSelected.size(); j++) {
+		// if (coursesIsExist.get(i).getCourse().getId() ==
+		// coursesSelected.get(j).getId()) {
+		// exist = true;
+		// break;
+		// }
+		// }
+		// if (!exist) {
+		// try {
+		// COURSE_POSITION_JOB_SERVICE.delete(coursesIsExist.get(i));
+		// } catch (Exception e) {
+		// e.printStackTrace();
+		// }
+		// }
+		// }
+		// // list vi tri khoa hoc sau khi xoa
+		// coursesIsExist =
+		// COURSE_POSITION_JOB_SERVICE.findByPosition(positionSettingSelected.getCode());
+		// for (int i = 0; i < coursesSelected.size(); i++) {
+		// boolean exist = false;
+		// for (int j = 0; j < coursesIsExist.size(); j++) {
+		// if (coursesSelected.get(i).getId() ==
+		// coursesIsExist.get(j).getCourse().getId()) {
+		// exist = true;
+		// }
+		// }
+		// if (!exist) {
+		// // 1.position job , 2.course
+		// CoursePositionJob cpNew = new
+		// CoursePositionJob(positionSettingSelected.getCode(),
+		// coursesSelected.get(i));
+		// cpNew.setCreatedDate(new Date());
+		// cpNew.setCreatedUser(getAccount().getMember().getCode());
+		// try {
+		// cpNew = COURSE_POSITION_JOB_SERVICE.create(cpNew);
+		// } catch (Exception e) {
+		// e.printStackTrace();
+		// }
+		// }
+		// }
+		// MessageView.INFO("Thành công");
+		// }
 	}
 
 	public void saveOrUpdate() {
-		if (positionSettingSelected == null) {
-			MessageView.WARN("Không có thay đổi");
+		// loc ra danh sach khoa hoc duoc chon
+		List<Course> coursesSelected = new ArrayList<>();
+		for (int j = 0; j < allCourse.size(); j++) {
+			if (allCourse.get(j).isSelect()) {
+				coursesSelected.add(allCourse.get(j));
+			}
+		}
+		if (coursesSelected.isEmpty()) {
+			MessageView.WARN("Không có khóa học nào được chọn");
 			return;
 		}
-		coursesSelected = new ArrayList<>();
-		for (int i = 0; i < allCourse.size(); i++) {
-			if (allCourse.get(i).isSelect()) {
-				coursesSelected.add(allCourse.get(i));
-				// allCourse.get(i).setSelect(false);
-			}
-		}
-		// kiem tra vi tri do da duoc tao chua
-		List<CoursePositionJob> coursesIsExist = COURSE_POSITION_JOB_SERVICE
-				.findByPosition(positionSettingSelected.getCode());
-		if (coursesIsExist.isEmpty()) {
-			// tao moi toan bo
-			boolean isSuccess = true;
-			for (int i = 0; i < coursesSelected.size(); i++) {
-				// 1.position job , 2.course
-				CoursePositionJob cpNew = new CoursePositionJob(positionSettingSelected.getCode(),
-						coursesSelected.get(i));
-				cpNew.setCreatedDate(new Date());
-				cpNew.setCreatedUser(getAccount().getMember().getCode());
-				try {
-					cpNew = COURSE_POSITION_JOB_SERVICE.create(cpNew);
-				} catch (Exception e) {
-					isSuccess = false;
-					e.printStackTrace();
-				}
-			}
-			if (isSuccess) {
-				MessageView.INFO("Thành công");
-			} else {
-				MessageView.ERROR("Lỗi");
-			}
-		}
-		// vi tri da duoc tao -> them vi tri khoa hoc moi
-		else {
-			for (int i = 0; i < coursesIsExist.size(); i++) {
-				boolean exist = false;
-				for (int j = 0; j < coursesSelected.size(); j++) {
-					if (coursesIsExist.get(i).getCourse().getId() == coursesSelected.get(j).getId()) {
-						exist = true;
-						break;
+		boolean isSuccess = true;
+		boolean isSelected = false; // kiem tra co vi tri nao duoc chon hay
+									// khong
+		for (int i = 0; i < positions.size(); i++) {
+			if (positions.get(i).isSelect()) {
+				isSelected = true;
+				// kiem tra vi tri do da duoc tao chua
+				List<CoursePositionJob> coursesIsExist = COURSE_POSITION_JOB_SERVICE
+						.findByPosition(positions.get(i).getCode());
+				if (coursesIsExist.isEmpty()) {
+					// tao moi toan bo
+					for (int j = 0; j < coursesSelected.size(); j++) {
+						// 1.position job , 2.course
+						CoursePositionJob cpNew = new CoursePositionJob(positions.get(i).getCode(),
+								coursesSelected.get(j));
+						cpNew.setCreatedDate(new Date());
+						cpNew.setCreatedUser(getAccount().getMember().getCode());
+						try {
+							cpNew = COURSE_POSITION_JOB_SERVICE.create(cpNew);
+						} catch (Exception e) {
+							isSuccess = false;
+							e.printStackTrace();
+						}
 					}
 				}
-				if (!exist) {
-					try {
-						COURSE_POSITION_JOB_SERVICE.delete(coursesIsExist.get(i));
-					} catch (Exception e) {
-						e.printStackTrace();
+				// vi tri da duoc tao -> them vi tri khoa hoc moi
+				else {
+					for (int j = 0; j < coursesIsExist.size(); j++) {
+						boolean exist = false;
+						for (int k = 0; k < coursesSelected.size(); k++) {
+							if (coursesIsExist.get(j).getCourse().getId() == coursesSelected.get(k).getId()) {
+								exist = true;
+								break;
+							}
+						}
+						if (!exist) {
+							try {
+								COURSE_POSITION_JOB_SERVICE.delete(coursesIsExist.get(j));
+							} catch (Exception e) {
+								isSuccess = false;
+								e.printStackTrace();
+							}
+						}
 					}
-				}
-			}
-			// list vi tri khoa hoc sau khi xoa
-			coursesIsExist = COURSE_POSITION_JOB_SERVICE.findByPosition(positionSettingSelected.getCode());
-			for (int i = 0; i < coursesSelected.size(); i++) {
-				boolean exist = false;
-				for (int j = 0; j < coursesIsExist.size(); j++) {
-					if (coursesSelected.get(i).getId() == coursesIsExist.get(j).getCourse().getId()) {
-						exist = true;
-					}
-				}
-				if (!exist) {
-					// 1.position job , 2.course
-					CoursePositionJob cpNew = new CoursePositionJob(positionSettingSelected.getCode(),
-							coursesSelected.get(i));
-					cpNew.setCreatedDate(new Date());
-					cpNew.setCreatedUser(getAccount().getMember().getCode());
-					try {
-						cpNew = COURSE_POSITION_JOB_SERVICE.create(cpNew);
-					} catch (Exception e) {
-						e.printStackTrace();
+					// list vi tri khoa hoc sau khi xoa
+					coursesIsExist = COURSE_POSITION_JOB_SERVICE.findByPosition(positions.get(i).getCode());
+					for (int j = 0; j < coursesSelected.size(); j++) {
+						boolean exist = false;
+						for (int k = 0; k < coursesIsExist.size(); k++) {
+							if (coursesSelected.get(j).getId() == coursesIsExist.get(k).getCourse().getId()) {
+								exist = true;
+							}
+						}
+						if (!exist) {
+							// 1.position job , 2.course
+							CoursePositionJob cpNew = new CoursePositionJob(positions.get(i).getCode(),
+									coursesSelected.get(j));
+							cpNew.setCreatedDate(new Date());
+							cpNew.setCreatedUser(getAccount().getMember().getCode());
+							try {
+								cpNew = COURSE_POSITION_JOB_SERVICE.create(cpNew);
+							} catch (Exception e) {
+								isSuccess = false;
+								e.printStackTrace();
+							}
+						}
 					}
 				}
 			}
-			MessageView.INFO("Thành công");
-		}
 
+		}
+		if (!isSelected) {
+			MessageView.WARN("Không có vị trí/chức danh nào được chọn");
+			return;
+		}
+		if (isSuccess) {
+			MessageView.INFO("Thành công");
+		} else {
+			MessageView.ERROR("Lỗi");
+		}
 	}
 
 	public void fileKhoaHocViTriMau() {
@@ -333,13 +432,14 @@ public class CoursePositionJobBean extends AbstractBean<CoursePositionJob> {
 		this.allCourse = allCourse;
 	}
 
-	public PositionJob getPositionSettingSelected() {
-		return positionSettingSelected;
-	}
-
-	public void setPositionSettingSelected(PositionJob positionSettingSelected) {
-		this.positionSettingSelected = positionSettingSelected;
-	}
+	// public PositionJob getPositionSettingSelected() {
+	// return positionSettingSelected;
+	// }
+	//
+	// public void setPositionSettingSelected(PositionJob
+	// positionSettingSelected) {
+	// this.positionSettingSelected = positionSettingSelected;
+	// }
 
 	public List<PositionJob> getPositionsSettingFilter() {
 		return positionsSettingFilter;
