@@ -91,4 +91,29 @@ public class PositionJobService extends AbstractService<PositionJob> {
 			return new PositionJob();
 		}
 	}
+
+	public PositionJob findByCode(String code) {
+		// primary
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaQuery<PositionJob> cq = cb.createQuery(PositionJob.class);
+		Root<PositionJob> root = cq.from(PositionJob.class);
+		List<Predicate> queries = new ArrayList<>();
+		if (code != null) {
+			Predicate foodNameQuery = cb.equal(root.get("code"), code);
+			queries.add(foodNameQuery);
+		}
+		Predicate data[] = new Predicate[queries.size()];
+		for (int i = 0; i < queries.size(); i++) {
+			data[i] = queries.get(i);
+		}
+		Predicate finalPredicate = cb.and(data);
+		cq.where(finalPredicate);
+		TypedQuery<PositionJob> query = em.createQuery(cq);
+		List<PositionJob> results = query.getResultList();
+		if (!results.isEmpty()) {
+			return results.get(0);
+		} else {
+			return new PositionJob();
+		}
+	}
 }

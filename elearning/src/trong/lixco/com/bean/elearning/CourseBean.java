@@ -238,7 +238,7 @@ public class CourseBean extends AbstractBean<Course> {
 			MessageView.WARN("Vui lòng điền đầy dủ thông tin");
 			return;
 		}
-		Skill checkExist = SKILL_SERVICE.findByName(skillNew.getName());
+		Skill checkExist = SKILL_SERVICE.findByNameAndCourse(skillNew.getName(), skillNew.getCourse().getId());
 		if (checkExist.getId() != null) {
 			MessageView.WARN("Thông tin đã bị trùng");
 			return;

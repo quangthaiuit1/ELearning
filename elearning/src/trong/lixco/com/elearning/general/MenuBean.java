@@ -61,6 +61,9 @@ public class MenuBean extends AbstractBean<AbstractEntity> {
 	public void setupMenuPreview() {
 		try {
 			menus = new ArrayList<Menu>();
+			boolean isNotPermission = false;// kiem tra xem co duoc phan quyen
+											// hay khong. neu khong duoc bo het
+											// menu
 			Program program = programService.findByName(NameSytem.NAMEPROGRAM);
 			Menu temps[] = menuService.find_Program(program);
 			if (temps != null) {
@@ -68,14 +71,26 @@ public class MenuBean extends AbstractBean<AbstractEntity> {
 					if ("".equals(temps[j].getUrl())) {
 						menus.add(temps[j]);
 					} else {
-						if (getUrlPermissions().size() == 0)
+						if (getUrlPermissions().size() == 0) {
 							authorizationManager.isAllowed(getAccount());
+							isNotPermission = true;
+						}
 						for (int i = 0; i < getUrlPermissions().size(); i++) {
 							if (getUrlPermissions().get(i).getUrl().contains(temps[j].getUrl())) {
 								menus.add(temps[j]);
 								break;
 							}
 						}
+					}
+				}
+			}
+			if (isNotPermission) {
+				menus = new ArrayList<Menu>();
+				// them menu cho nhung nguoi khong duoc phan quyen
+				for (Menu m : temps) {
+					if (m.getUrl().equals("/elearning/pages/nhanvien/dskhoahoc.htm")
+							|| m.getTenHienThi().equals("Khóa học")) {
+						menus.add(m);
 					}
 				}
 			}

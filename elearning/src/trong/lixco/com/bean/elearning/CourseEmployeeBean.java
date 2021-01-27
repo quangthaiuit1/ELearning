@@ -254,8 +254,10 @@ public class CourseEmployeeBean extends AbstractBean<Course> {
 	public void registerNewCourse() {
 		try {
 			if (plansByDepart != null && !plansByDepart.isEmpty()) {
+				boolean coursesSelected = false;
 				for (int i = 0; i < allCourse.size(); i++) {
 					if (allCourse.get(i).isSelect()) {
+						coursesSelected = true;
 						PlanDetail pd = PLAN_DETAIL_SERVICE.findByCourseAndPlan(allCourse.get(i).getId(),
 								plansByDepart.get(0).getId());
 						// khoa hoc chua duoc tao
@@ -285,6 +287,10 @@ public class CourseEmployeeBean extends AbstractBean<Course> {
 						}
 						allCourse.get(i).setSelect(false);
 					}
+				}
+				if (!coursesSelected) {
+					MessageView.WARN("Vui lòng tích chọn khóa học xong nhấn đăng ký");
+					return;
 				}
 				// query danh sach chi tiet ke hoach
 				detailsByPlan = PLAN_DETAIL_SERVICE.findByPlan(plansByDepart.get(0).getId());

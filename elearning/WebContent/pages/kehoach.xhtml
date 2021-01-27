@@ -87,15 +87,21 @@
 									</p:column>
 								</p:selectOneMenu>
 							</h:panelGrid>
-							<p:commandButton value="Tạo mới" style="float:right;"
-								icon="ui-icon-plus" update="dtTablePlan,growlPlan"
-								process="@form" oncomplete="PF('dtlistKeHoach').clearFilters()"
-								actionListener="#{coursePlanBean.create()}" />
-							<p:commandButton value="Tìm" style="float:right;"
-								icon="ui-icon-search" update="dtTablePlan" process="@form"
+							<p:commandButton value="Đồng bộ" style="float:right;"
+								styleClass="btnWarning" icon="fa fa-refresh"
+								update="dtTablePlan,growlPlan" process="@form"
 								oncomplete="PF('dtlistKeHoach').clearFilters()"
+								actionListener="#{coursePlanBean.syncPlan()}" />
+							<p:commandButton value="Tạo mới" styleClass="btadd"
+								style="float:right;" icon="ui-icon-plus"
+								update="dtTablePlan,growlPlan" process="@form"
+								oncomplete="PF('dtlistKeHoach').clearFilters()"
+								actionListener="#{coursePlanBean.create()}" />
+							<p:commandButton value="Tìm" styleClass="btsearch"
+								style="float:right;" icon="ui-icon-search" update="dtTablePlan"
+								process="@form" oncomplete="PF('dtlistKeHoach').clearFilters()"
 								actionListener="#{coursePlanBean.searchItem()}" />
-							<p:commandButton value="Xóa" id="xoact"
+							<p:commandButton value="Xóa" styleClass="btnDelete" id="xoact"
 								oncomplete="PF('dtlistKeHoach').clearFilters()"
 								update=":messages,dtTablePlan"
 								action="#{coursePlanBean.delete()}">

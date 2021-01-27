@@ -68,7 +68,7 @@ public class SkillService extends AbstractService<Skill> {
 		}
 	}
 
-	public Skill findByName(String name) {
+	public Skill findByNameAndCourse(String name, long courseId) {
 		// primary
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Skill> cq = cb.createQuery(Skill.class);
@@ -76,6 +76,10 @@ public class SkillService extends AbstractService<Skill> {
 		List<Predicate> queries = new ArrayList<>();
 		if (name != null) {
 			Predicate foodNameQuery = cb.equal(root.get("name"), name);
+			queries.add(foodNameQuery);
+		}
+		if (courseId != 0) {
+			Predicate foodNameQuery = cb.equal(root.get("course").get("id"), courseId);
 			queries.add(foodNameQuery);
 		}
 		Predicate data[] = new Predicate[queries.size()];

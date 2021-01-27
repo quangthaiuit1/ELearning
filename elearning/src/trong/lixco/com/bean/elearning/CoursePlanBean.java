@@ -28,12 +28,14 @@ import trong.lixco.com.ejb.service.elearning.CourseService;
 import trong.lixco.com.ejb.service.elearning.PlanDetailService;
 import trong.lixco.com.ejb.service.elearning.PlanDetailSkillService;
 import trong.lixco.com.ejb.service.elearning.PlanService;
+import trong.lixco.com.ejb.service.elearning.PositionJobService;
 import trong.lixco.com.ejb.service.elearning.SkillService;
 import trong.lixco.com.jpa.entities.Course;
 import trong.lixco.com.jpa.entities.CoursePositionJob;
 import trong.lixco.com.jpa.entities.Plan;
 import trong.lixco.com.jpa.entities.PlanDetail;
 import trong.lixco.com.jpa.entities.PlanDetailSkill;
+import trong.lixco.com.jpa.entities.PositionJob;
 import trong.lixco.com.jpa.entities.Skill;
 import trong.lixco.com.servicepublic.EmployeeDTO;
 import trong.lixco.com.servicepublic.EmployeeServicePublic;
@@ -74,12 +76,14 @@ public class CoursePlanBean extends AbstractBean<Course> {
 	private SkillService SKILL_SERVICE;
 	@Inject
 	private PlanDetailSkillService PLAN_DETAIL_SKILL_SERVICE;
+	@Inject
+	private PositionJobService positionJobService;
 
 	@Override
 	protected void initItem() {
 		try {
 			yearSearch = Calendar.getInstance().get(Calendar.YEAR);
-			EMPLOYEE_SERVICE_PUBLIC = new EmployeeServicePublicProxy();
+			// EMPLOYEE_SERVICE_PUBLIC = new EmployeeServicePublicProxy();
 			departmentServicePublic = new DepartmentServicePublicProxy();
 			memberServicePublic = new MemberServicePublicProxy();
 			member = getAccount().getMember();
@@ -270,12 +274,117 @@ public class CoursePlanBean extends AbstractBean<Course> {
 					// tim thu nhan vien do duoc tao chua
 					List<Plan> pEixst = PLAN_SERVICE.findByEmplCodeAndYear(allMember.get(i).getCode(), yearSearch);
 					if (pEixst.isEmpty()) {
-						PLAN_SERVICE.create(pNew);
+						pNew = PLAN_SERVICE.create(pNew);
+						// tim danh sach vi tri theo tung nhan vien
+						// List<PositionJob> positionJobsByEmpl = new
+						// ArrayList<>();
+						PositionJobData[] empPJobs = PositionJobDataService.vttheonhanvien(pNew.getEmployee_code());
+						if (empPJobs != null) {
+							for (int j = 0; j < empPJobs.length; j++) {
+								PositionJob pj = positionJobService.findByCode(empPJobs[j].getCode());
+								if (pj != null) {
+									// positionJobsByEmpl.add(pj);
+									// tim cac khoa hoc theo vi tri cong viec
+									List<CoursePositionJob> cps = COURSE_POSITION_JOB_SERVICE
+											.findByPosition(pj.getCode());
+									for (int k = 0; k < cps.size(); k++) {
+										// tao plan detail
+										PlanDetail pdnewTemp = new PlanDetail();
+										pdnewTemp.setCourse(cps.get(k).getCourse());
+										pdnewTemp.setPlan(pNew);
+										pdnewTemp.setCreatedDate(new Date());
+										pdnewTemp.setCreatedUser(member.getCode());
+										pdnewTemp = PLAN_DETAIL_SERVICE.create(pdnewTemp);
+										// tim danh sach ki nang theo khoa hoc
+										List<Skill> sByCourse = SKILL_SERVICE
+												.findByCourse(pdnewTemp.getCourse().getId());
+										for (int l = 0; l < sByCourse.size(); l++) {
+											// tao plan detail skill
+											PlanDetailSkill pdsTemp = new PlanDetailSkill();
+											pdsTemp.setCreatedDate(new Date());
+											pdsTemp.setCreatedUser(member.getCode());
+											pdsTemp.setPlan_detail(pdnewTemp);
+											pdsTemp.setSkill(sByCourse.get(l));
+											PLAN_DETAIL_SKILL_SERVICE.create(pdsTemp);
+										}
+									}
+								}
+							}
+						}
 					}
 				}
+				// //Test
 				plansByDepart = PLAN_SERVICE.findByDepartAndYear(departmentSelected.getCode(), yearSearch);
+				// tao cac khoa hoc va ki nang cho tung nhan vien
+				for (int i = 0; i < plansByDepart.size(); i++) {
+				}
+				// //End Test
 				MessageView.INFO("Thành công");
 			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			MessageView.ERROR("Lỗi");
+		}
+	}
+
+	// dong bo du lieu cho cac khoa hoc moi cap nhat
+	public void syncPlan() {
+		try {
+			// //Test
+			List<Plan> allPlanByYear = PLAN_SERVICE.findByDepartAndYear(null, yearSearch);
+			// tao cac khoa hoc va ki nang cho tung nhan vien
+			for (int i = 0; i < allPlanByYear.size(); i++) {
+				// tim danh sach vi tri theo tung nhan vien
+				// List<PositionJob> positionJobsByEmpl = new ArrayList<>();
+				PositionJobData[] empPJobs = PositionJobDataService
+						.vttheonhanvien(allPlanByYear.get(i).getEmployee_code());
+				if (empPJobs != null) {
+					for (int j = 0; j < empPJobs.length; j++) {
+						PositionJob pj = positionJobService.findByCode(empPJobs[j].getCode());
+						if (pj != null) {
+							// positionJobsByEmpl.add(pj);
+							// tim cac khoa hoc theo vi tri cong viec
+							List<CoursePositionJob> cps = COURSE_POSITION_JOB_SERVICE.findByPosition(pj.getCode());
+							for (int k = 0; k < cps.size(); k++) {
+								// tao plan detail
+								PlanDetail pdnewTemp = new PlanDetail();
+								pdnewTemp.setCourse(cps.get(k).getCourse());
+								pdnewTemp.setPlan(allPlanByYear.get(i));
+								pdnewTemp.setCreatedDate(new Date());
+								pdnewTemp.setCreatedUser(member.getCode());
+								// kiem tra xem plan detail da duoc tao chua
+								PlanDetail pdCheck = PLAN_DETAIL_SERVICE.findByCourseAndPlan(
+										cps.get(k).getCourse().getId(), allPlanByYear.get(i).getId());
+								if (pdCheck.getId() != null && pdCheck.getId() != 0) {
+									pdnewTemp = pdCheck;
+								} else {
+									pdnewTemp = PLAN_DETAIL_SERVICE.create(pdnewTemp);
+								}
+								// tim danh sach ki nang theo khoa hoc
+								List<Skill> sByCourse = SKILL_SERVICE.findByCourse(pdnewTemp.getCourse().getId());
+								for (int l = 0; l < sByCourse.size(); l++) {
+									// tao plan detail skill
+									PlanDetailSkill pdsTemp = new PlanDetailSkill();
+									pdsTemp.setCreatedDate(new Date());
+									pdsTemp.setCreatedUser(member.getCode());
+									pdsTemp.setPlan_detail(pdnewTemp);
+									pdsTemp.setSkill(sByCourse.get(l));
+									// kiem tra plan detail skill da duoc
+									// tao hay chua
+									List<PlanDetailSkill> pdsCheck = PLAN_DETAIL_SKILL_SERVICE
+											.findBySkillAndPlanDetail(pdsTemp.getSkill().getId(), pdnewTemp.getId());
+									if (pdsCheck.isEmpty()) {
+										PLAN_DETAIL_SKILL_SERVICE.create(pdsTemp);
+									}
+
+								}
+							}
+						}
+					}
+				}
+			}
+			// //End Test
+			MessageView.INFO("Thành công");
 		} catch (Exception e) {
 			e.printStackTrace();
 			MessageView.ERROR("Lỗi");
