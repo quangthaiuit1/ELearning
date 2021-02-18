@@ -5,7 +5,6 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.util.List;
 
-import javax.annotation.PreDestroy;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
@@ -14,7 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang3.StringUtils;
 import org.docx4j.org.xhtmlrenderer.pdf.ITextRenderer;
 import org.jboss.logging.Logger;
 import org.omnifaces.cdi.ViewScoped;
@@ -44,6 +42,10 @@ public class InfoCourseBean extends AbstractBean<Course> {
 	protected void initItem() {
 		long pdSkillSelectedId = getPlanDetailId();
 		skillDetailsBySkill = SKILL_DETAIL_SERVICE.findBySkill(pdSkillSelectedId);
+		if (!skillDetailsBySkill.isEmpty()) {
+			skillDetailSelected = skillDetailsBySkill.get(0);
+			pathVideo = skillDetailSelected.getFile_video();
+		}
 	}
 
 	public long getPlanDetailId() {
@@ -127,7 +129,7 @@ public class InfoCourseBean extends AbstractBean<Course> {
 				count += 1;
 				Thread.sleep(30000);
 				saveTimeElapsedVideo.run();
-				
+
 			} catch (InterruptedException v) {
 				System.out.println(v);
 			}
@@ -147,13 +149,13 @@ public class InfoCourseBean extends AbstractBean<Course> {
 
 	public void onPlay() {
 		events = "play" + "\n" + events;
-//		saveTimeElapsedVideo.start();
+		// saveTimeElapsedVideo.start();
 		System.out.println("da vao play");
 	}
 
 	public void onPause() {
 		events = "pause" + "\n" + events;
-//		saveTimeElapsedVideo.stop();
+		// saveTimeElapsedVideo.stop();
 	}
 
 	public void onSeeking() {

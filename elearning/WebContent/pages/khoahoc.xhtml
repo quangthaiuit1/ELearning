@@ -423,10 +423,11 @@
 		<p:dialog widgetVar="dialogDataVideo" modal="true" resizable="false"
 			width="400" closeOnEscape="true" header="Tài liệu">
 			<h:form id="bg1" enctype="multipart/form-data">
-				<p:fileUpload style="text-align:center" update="tv,growlCourse"
-					id="videoUpload" dragDropSupport="true"
-					allowTypes="/(\.)(mp4|avi|flv)$/" label="Chọn file từ máy tính"
-					cancelLabel="Huỷ" uploadLabel="Tải lên" fileLimit="1"
+				<p:fileUpload style="text-align:center"
+					update="tv,growlCourse,@this" id="videoUpload"
+					dragDropSupport="true" allowTypes="/(\.)(mp4|avi|flv)$/"
+					label="Chọn file từ máy tính" cancelLabel="Huỷ"
+					uploadLabel="Tải lên" fileLimit="1"
 					fileUploadListener="#{courseBean.updateDataVideo}" mode="advanced"
 					sizeLimit="204800000" />
 				<p:panelGrid columns="1" style="width:100%">
