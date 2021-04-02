@@ -141,6 +141,22 @@ public class CourseEmployeeBean extends AbstractBean<Course> {
 			positionsByEmplList = Arrays.asList(positionsByEmpl);
 			// query danh sach chi tiet ke hoach
 			detailsByPlan = PLAN_DETAIL_SERVICE.findByPlan(plansByDepart.get(0).getId());
+			// handle button danh gia khoa hoc
+			for (int j = 0; j < detailsByPlan.size(); j++) {
+				List<PlanDetailSkill> pdsTemp = PLAN_DETAIL_SKILL_SERVICE.findBySkillAndPlanDetail(0,
+						detailsByPlan.get(j).getId());
+				// tinh tong so ki nang da hoan thanh
+				int skillSucc = 0;
+				for (int i = 0; i < pdsTemp.size(); i++) {
+					if (pdsTemp.get(i).getScore_tracnghiem() > 0) {
+						skillSucc = skillSucc + 1;
+					}
+				}
+				// neu so ki nang hoan thanh 75% ->
+				if (((float) skillSucc / pdsTemp.size()) >= 0.75) {
+					detailsByPlan.get(j).setRate(true);
+				}
+			}
 			positionSelected = new PositionJobData();
 			coursesByPosition = new ArrayList<>();
 		}

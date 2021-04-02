@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
@@ -128,6 +129,8 @@ public class CourseBean extends AbstractBean<Course> {
 		skillNew = new Skill();
 		member = getAccount().getMember();
 		answerNew = new Answer();
+		questionUpdate = new Question();
+		questionUpdate.setImage_name("noimage.png");
 	}
 
 	public void courseTypeOnRowSelect() {
@@ -162,6 +165,7 @@ public class CourseBean extends AbstractBean<Course> {
 			if (courseTypeSelected != null) {
 				coursesByType = COURSE_SERVICE.findByCourseType(courseTypeSelected.getId());
 			}
+			courseNew = new Course();
 			MessageView.INFO("Thành công");
 			return;
 		}
@@ -382,6 +386,10 @@ public class CourseBean extends AbstractBean<Course> {
 		notify = new Notify(FacesContext.getCurrentInstance());
 		if (allowUpdate(null)) {
 			try (InputStream input = event.getFile().getInputstream()) {
+				if (skillDetailSelected == null || skillDetailSelected.getId() == null) {
+					MessageView.ERROR("Chưa chọn chi tiết kĩ năng");
+					return;
+				}
 				byte[] file = IOUtils.toByteArray(input);
 				byte[] fileold = PDFMerger.getFile(STORAGE_PATH_SERVICE.findByName("file").getPath(),
 						skillDetailSelected.getFile_document());
@@ -402,6 +410,7 @@ public class CourseBean extends AbstractBean<Course> {
 					skillDetailSelected = SKILL_DETAIL_SERVICE.update(skillDetailSelected);
 					// kpiPersonOfMonths.set(kpiPersonOfMonths.indexOf(kpm),
 					// this.kpm);
+					pathVideo = skillDetailSelected.getFile_video();
 					PrimeFaces.current().executeScript("PF('dialogDataAssign').hide();");
 					notice("Tải lên thành công.");
 				}
@@ -421,6 +430,10 @@ public class CourseBean extends AbstractBean<Course> {
 		notify = new Notify(FacesContext.getCurrentInstance());
 
 		try {
+			if (skillDetailSelected == null || skillDetailSelected.getId() == null) {
+				MessageView.ERROR("Chưa chọn chi tiết kĩ năng");
+				return;
+			}
 			InputStream in = event.getFile().getInputstream();
 			// Ghi inputStream vao 1 OutputStream
 			// Tao outputstream -> new doi tuong xong truyen duong dan +
@@ -449,6 +462,7 @@ public class CourseBean extends AbstractBean<Course> {
 
 			skillDetailSelected.setFile_video(filename);
 			skillDetailSelected = SKILL_DETAIL_SERVICE.update(skillDetailSelected);
+			pathVideo = skillDetailSelected.getFile_video();
 			PrimeFaces.current().executeScript("PF('dialogDataVideo').hide();");
 			notice("Tải lên thành công.");
 
@@ -630,6 +644,28 @@ public class CourseBean extends AbstractBean<Course> {
 		}
 	}
 
+	public void updateQuestion() {
+		try {
+			// kiem tra ten co bi trung hay khong
+			Question qCheck = QUESTION_SERVICE.findByNameAndSkill(questionUpdate.getName_question(),
+					questionUpdate.getSkill().getId());
+			if (qCheck.getId() != null && qCheck.getImage_name() != null) {
+				if (qCheck.getImage_name().equals(questionUpdate.getImage_name())) {
+					MessageView.ERROR("Câu hỏi đã bị trùng!");
+					return;
+				}
+			}
+			QUESTION_SERVICE.update(questionUpdate);
+			// get du lieu cau hoi
+			if (skillSelected != null && skillSelected.getId() != null) {
+				questionsBySkill = QUESTION_SERVICE.findBySkill(skillSelected.getId());
+			}
+			MessageView.INFO("Thành công");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	// import file excel
 	public void handleFileUpload(FileUploadEvent event) throws IOException {
 
@@ -667,11 +703,15 @@ public class CourseBean extends AbstractBean<Course> {
 				System.out.println(wb.getSheetAt(i).getSheetName());
 				echoAsCSVFile(wb.getSheetAt(i));
 			}
+			// cap nhat lai danh sach cau hoi
+			questionsBySkill = QUESTION_SERVICE.findBySkill(skillSelected.getId());
 		} catch (Exception ex) {
+			ex.printStackTrace();
 		} finally {
 			try {
 				inp.close();
 			} catch (IOException ex) {
+				ex.printStackTrace();
 			}
 		}
 	}
@@ -753,6 +793,52 @@ public class CourseBean extends AbstractBean<Course> {
 			FacesContext.getCurrentInstance().responseComplete();
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+	}
+
+	public void upload(FileUploadEvent event) {
+		FacesMessage msg = new FacesMessage("Success! ", event.getFile().getFileName() + " is uploaded.");
+		FacesContext.getCurrentInstance().addMessage(null, msg);
+		// Do what you want with the file
+		try {
+			copyFile(event.getFile().getFileName(), event.getFile().getInputstream());
+			// JSFUtil.adicionarMensajeSuceso("Imagen subida correctamente");
+			PrimeFaces.current().ajax().update("formCapNhatCauHoi:graphicImageUpdateQuestion");
+		} catch (IOException e) {
+			e.printStackTrace();
+			// JSFUtil.adicionarMensajeError(e.getMessage());
+		}
+	}
+
+	private String destination = "D:\\STORAGE-ELEARNING\\IMAGES\\";
+
+	public void copyFile(String fileName, InputStream in) {
+		ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
+		// String filePath =
+		// ec.getRealPath(String.format("/resources/images/%s","/"));
+		// System.out.println(filePath);
+		try {
+
+			// write the inputStream to a FileOutputStream
+			String fileNameImageCurrent = System.currentTimeMillis() + "-" + fileName;
+			String fileNameFull = destination + fileNameImageCurrent;
+			questionUpdate.setImage_name(fileNameImageCurrent);
+			OutputStream out = new FileOutputStream(new File(fileNameFull));
+
+			int read = 0;
+			byte[] bytes = new byte[1024];
+
+			while ((read = in.read(bytes)) != -1) {
+				out.write(bytes, 0, read);
+			}
+
+			in.close();
+			out.flush();
+			out.close();
+
+			System.out.println("New file created!");
+		} catch (IOException e) {
+			System.out.println(e.getMessage());
 		}
 	}
 

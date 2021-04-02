@@ -121,8 +121,8 @@
 											oncomplete="PF('wgvCreateCourse').show();"
 											icon="ui-icon-plus" />
 									</f:facet>
-									<p:column headerText="ID" style="width:50px;text-align:center">
-										<h:outputText value="#{item1.id}" />
+									<p:column headerText="STT" style="width:50px;text-align:center">
+										<h:outputText value="#{rowIndex + 1}" />
 									</p:column>
 
 									<p:column headerText="Khóa học"
@@ -307,9 +307,10 @@
 										<p:fileUpload
 											fileUploadListener="#{courseBean.handleFileUpload}"
 											mode="advanced" dragDropSupport="false" multiple="true"
-											update="messagesh,growlCourse" sizeLimit="10000000"
-											allowTypes="/(\.|\/)(xls|xlsx)$/" label="Chọn tệp tải lên"
-											uploadLabel="Tải lên" cancelLabel="Hủy" process="@form" />
+											update="messagesh,growlCourse,tv:tab2:dtQuestion"
+											sizeLimit="10000000" allowTypes="/(\.|\/)(xls|xlsx)$/"
+											label="Chọn tệp tải lên" uploadLabel="Tải lên"
+											cancelLabel="Hủy" process="@form" />
 										<p:growl id="messagesh" showDetail="true" />
 									</h:form>
 									<!-- end upload -->
@@ -327,6 +328,15 @@
 								<p:column headerText="loại câu hỏi" width="50">
 									<h:outputText value="#{item4.question_type.name}" />
 								</p:column>
+
+								<p:column headerText="Sửa" style="width:10%;text-align: center">
+									<p:commandButton update="updateQuest" icon="fa fa-edit"
+										oncomplete="PF('dialogUpdateQuest').show();">
+										<f:setPropertyActionListener value="#{item4}"
+											target="#{courseBean.questionUpdate}" />
+									</p:commandButton>
+								</p:column>
+
 								<p:column headerText="Xóa" width="20">
 									<p:commandButton icon="fa fa-trash" id="btnRemoveQ"
 										type="submit" process="@form" style="color:red"
@@ -424,12 +434,12 @@
 			width="400" closeOnEscape="true" header="Tài liệu">
 			<h:form id="bg1" enctype="multipart/form-data">
 				<p:fileUpload style="text-align:center"
-					update="tv,growlCourse,@this" id="videoUpload"
+					update="tv:tab3,growlCourse,@this" id="videoUpload"
 					dragDropSupport="true" allowTypes="/(\.)(mp4|avi|flv)$/"
 					label="Chọn file từ máy tính" cancelLabel="Huỷ"
 					uploadLabel="Tải lên" fileLimit="1"
 					fileUploadListener="#{courseBean.updateDataVideo}" mode="advanced"
-					sizeLimit="204800000" />
+					sizeLimit="3147483648" />
 				<p:panelGrid columns="1" style="width:100%">
 					<p:selectBooleanCheckbox value="#{courseBean.orverideData}"
 						itemLabel="Nạp lại dữ liệu">
@@ -467,7 +477,7 @@
 					<p:commandButton style="align:center;" styleClass="btadd"
 						type="submit" value="Thêm" action="#{courseBean.createCourse()}"
 						icon="ui-icon-plus" oncomplete="PF('wgvCreateCourse').hide();"
-						update="tv:formCourse:dtCourse,growlCourse" />
+						update="tv:formCourse:dtCourse,growlCourse,dialogCreateSource" />
 				</center>
 			</h:form>
 		</p:dialog>
@@ -652,6 +662,59 @@
 						update="tv:tab2:dtAnswer,growlCourse,dialogCreateAnswer"
 						oncomplete="PF('wgvCreateScore').hide();" />
 				</center>
+			</h:form>
+		</p:dialog>
+		<!-- Sua cau hoi -->
+		<p:dialog header="Cập nhật câu hỏi" id="updateQuest" width="600"
+			widgetVar="dialogUpdateQuest" modal="true" showEffect="fade"
+			hideEffect="fade" resizable="true">
+			<h:form id="formCapNhatCauHoi">
+				<p:outputPanel id="editQuest" style="text-align:center;">
+					<div class="ui-g" style="margin-bottom: 15px">
+						<h:outputText value="Tên câu hỏi"
+							style="margin-bottom:10px;font-weight:bold" />
+						<p:inputTextarea
+							style="width:100%!important;color: black!important"
+							id="inputEditQuestName"
+							value="#{courseBean.questionUpdate.name_question}">
+							<p:ajax process="@this" />
+						</p:inputTextarea>
+					</div>
+					<div class="ui-g" style="margin-bottom: 20px">
+						<h:outputText value="Hình ảnh"
+							style="margin-bottom:10px;font-weight:bold" />
+						<br />
+						<h:graphicImage id="graphicImageUpdateQuestion"
+							style="margin-top:5px;margin-bottom:20px"
+							value="/images/#{courseBean.questionUpdate.image_name}"
+							width="500" height="200" />
+						<br />
+						<div style="margin-top: 20px; margin: 0 auto">
+							<h:outputText value="Đổi hình ảnh"
+								style="margin-bottom:15px;font-weight:bold;font-size:20px;color:red;width:50%" />
+							<br />
+							<p:fileUpload
+								style="width: 100%!important;margin-top:5px;margin-left:22px"
+								fileUploadListener="#{courseBean.upload}"
+								allowTypes="/(\.|\/)(gif|jpe?g|png)$/" sizeLimit="10240000"
+								description="Select Images" />
+						</div>
+					</div>
+					<div class="ui-g" style="width: 50%; margin: 0 auto">
+						<div class="ui-g-6">
+							<p:commandButton icon="fa fa-remove" value="Hủy bỏ"
+								style=" margin-left: 0%" styleClass="btnDelete"
+								oncomplete="PF('dialogUpdateQuest').hide();" />
+						</div>
+						<div class="ui-g-6">
+							<p:commandButton icon="fa fa-check"
+								oncomplete="PF('dialogUpdateQuest').hide();" value="Cập nhật"
+								update="growlCourse,formCapNhatCauHoi,tv:tab2:dtQuestion"
+								styleClass="btnWarning" action="#{courseBean.updateQuestion()}"
+								process="formCapNhatCauHoi" />
+						</div>
+					</div>
+				</p:outputPanel>
 			</h:form>
 		</p:dialog>
 	</ui:define>

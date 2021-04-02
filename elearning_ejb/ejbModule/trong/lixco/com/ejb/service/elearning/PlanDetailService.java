@@ -18,6 +18,7 @@ import javax.persistence.criteria.Root;
 
 import trong.lixco.com.ejb.service.AbstractService;
 import trong.lixco.com.jpa.entities.Course;
+import trong.lixco.com.jpa.entities.Plan;
 import trong.lixco.com.jpa.entities.PlanDetail;
 
 @Stateless
@@ -123,6 +124,36 @@ public class PlanDetailService extends AbstractService<PlanDetail> {
 			return results.get(0);
 		} else {
 			return new PlanDetail();
+		}
+	}
+
+	// find tu ngay den ngay
+	public List<PlanDetail> findByDateToDate(java.util.Date firstDay, java.util.Date lastDay) {
+		// primary
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaQuery<PlanDetail> cq = cb.createQuery(PlanDetail.class);
+		Root<PlanDetail> root = cq.from(PlanDetail.class);
+		List<Predicate> queries = new ArrayList<>();
+		if (firstDay != null) {
+			Predicate resultQueryFirst = cb.greaterThanOrEqualTo(root.get("start_time"), firstDay);
+			queries.add(resultQueryFirst);
+		}
+		if (lastDay != null) {
+			Predicate resultQueryLast = cb.lessThanOrEqualTo(root.get("end_time"), lastDay);
+			queries.add(resultQueryLast);
+		}
+		Predicate data[] = new Predicate[queries.size()];
+		for (int i = 0; i < queries.size(); i++) {
+			data[i] = queries.get(i);
+		}
+		Predicate finalPredicate = cb.and(data);
+		cq.select(root).where(finalPredicate).orderBy(cb.asc(root.get("course")));
+		TypedQuery<PlanDetail> query = em.createQuery(cq);
+		List<PlanDetail> results = query.getResultList();
+		if (!results.isEmpty()) {
+			return results;
+		} else {
+			return new ArrayList<PlanDetail>();
 		}
 	}
 }

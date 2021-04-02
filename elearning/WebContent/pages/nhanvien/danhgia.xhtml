@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" xmlns:b="http://bootsfaces.net/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:h="http://java.sun.com/jsf/html" template="/pages/home.xhtml">
+
+	<ui:define name="content">
+		<style>
+.ui-dialog {
+	overflow: scroll !important;
+	max-height: 100% !important;
+}
+
+.sldapan label {
+	width: 90%;
+	margin-right: 0px !important;
+}
+
+.sldapan {
+	width: 100%;
+	margin: 0px;
+}
+
+.sldapan td {
+	padding: 0px;
+	text-align: left;
+}
+
+.lnumber {
+	background: #009688;
+	padding: 5px 10px;
+	color: white;
+	border-radius: 30px;
+	margin-right: 10px;
+}
+
+.lcauhoi {
+	font-size: 1.2em !important;
+	font-weight: bold;
+	color: #009688;
+}
+
+.diemdanhgia {
+	font-size: 1.1em !important;
+	text-decoration: underline !important;
+	color: #0e8bee !important;
+}
+
+legend.ui-fieldset-legend.ui-corner-all.ui-state-default {
+	font-size: 17px;
+}
+
+.animated .ui-progressbar-value {
+	background-image: url("#{resource['images/pbar-ani.gif']}");
+}
+
+.ui-panelgrid.showcase-text-align-center .ui-grid-responsive .ui-panelgrid-cell
+	{
+	text-align: center;
+}
+
+.customPanelGrid .ui-panelgrid-content {
+	align-items: center;
+}
+</style>
+		<script type="text/javascript">
+    //<![CDATA[
+    //]]>
+</script>
+		<p:growl id="growlPlan" showDetail="true" sticky="false" />
+		<h:form id="tab1">
+			<h3>#{courseDetailBean.coursePlaying.name}</h3>
+			<p:separator />
+
+			<h5>Đánh giá khóa học</h5>
+			<div class="ui-g" style="background: white; width: 100%">
+				<p:rating value="#{excuteRateBean.crNew.rate_score}"
+					style="width:100%">
+					<p:ajax process="@this" />
+				</p:rating>
+				<br />
+				<h:outputText
+					value="Anh/Chị vui lòng cho biết cảm nhận của mình như thế nào về khóa học: "
+					style="color:#04416D; font-weight:bold" />
+				<h:inputTextarea value="#{excuteRateBean.crNew.content}"
+					style="height:100px" />
+				<br />
+			</div>
+			<div class="ui-g"
+				style="text-align: center; margin-top: 10px; margin-bottom: 10px">
+				<p:commandButton styleClass="btsave"
+					style=" margin: 0 auto;border-radius:5px" value="Submit"
+					update="tab1,growlPlan" icon="fa fa-check"
+					action="#{excuteRateBean.createOrUpdate()}" />
+			</div>
+		</h:form>
+		<br />
+	</ui:define>
+</ui:composition>

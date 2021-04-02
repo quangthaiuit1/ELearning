@@ -73,6 +73,8 @@ public class AuthorizationManager implements Serializable {
 		uriUnprotected.add("/elearning/pages/nhanvien/chitietkhoahoc.htm");
 		uriUnprotected.add("/elearning/pages/nhanvien/test.htm");
 		uriUnprotected.add("/elearning/pages/nhanvien/thongtinkhoahoc.htm");
+		uriUnprotected.add("/elearning/pages/nhanvien/demokhoahoc.htm");
+		uriUnprotected.add("/elearning/pages/nhanvien/danhgia.htm");
 	}
 
 	public Program getProgram() {
@@ -105,8 +107,8 @@ public class AuthorizationManager implements Serializable {
 	}
 
 	/*
-	 * Kiem tra co cho phep truy cap. Neu cho phep thi set bo quyen cho account
-	 * với chương trinh. Bo quyen cai dat duoc uu tien gia tri cho phep
+	 * Kiem tra co cho phep truy cap. Neu cho phep thi set bo quyen cho account với
+	 * chương trinh. Bo quyen cai dat duoc uu tien gia tri cho phep
 	 */
 	public boolean isAllowed(Account account) {
 		init();

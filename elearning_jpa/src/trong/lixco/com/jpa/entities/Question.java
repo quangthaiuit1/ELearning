@@ -10,6 +10,7 @@ import trong.lixco.com.jpa.entity.AbstractEntity;
 @Table(name = "question")
 public class Question extends AbstractEntity {
 	private String name_question;
+	private String image_name;
 	// private String answer;
 	// private boolean is_true = false;
 
@@ -41,5 +42,13 @@ public class Question extends AbstractEntity {
 
 	public void setQuestion_type(QuestionType question_type) {
 		this.question_type = question_type;
+	}
+
+	public String getImage_name() {
+		return image_name;
+	}
+
+	public void setImage_name(String image_name) {
+		this.image_name = image_name;
 	}
 }

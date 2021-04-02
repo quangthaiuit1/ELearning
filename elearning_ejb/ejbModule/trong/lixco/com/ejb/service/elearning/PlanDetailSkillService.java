@@ -71,6 +71,31 @@ public class PlanDetailSkillService extends AbstractService<PlanDetailSkill> {
 		}
 	}
 
+	public List<PlanDetailSkill> findByCourseAndPlan(long planId) {
+		// primary
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaQuery<PlanDetailSkill> cq = cb.createQuery(PlanDetailSkill.class);
+		Root<PlanDetailSkill> root = cq.from(PlanDetailSkill.class);
+		List<Predicate> queries = new ArrayList<>();
+		if (planId != 0) {
+			Predicate query = cb.equal(root.get("plan").get("id"), planId);
+			queries.add(query);
+		}
+		Predicate data[] = new Predicate[queries.size()];
+		for (int i = 0; i < queries.size(); i++) {
+			data[i] = queries.get(i);
+		}
+		Predicate finalPredicate = cb.and(data);
+		cq.where(finalPredicate);
+		TypedQuery<PlanDetailSkill> query = em.createQuery(cq);
+		List<PlanDetailSkill> results = query.getResultList();
+		if (!results.isEmpty()) {
+			return results;
+		} else {
+			return new ArrayList<>();
+		}
+	}
+
 	public List<PlanDetailSkill> findBySkillAndPlanDetail(long skillId, long plandetailId) {
 		// primary
 		CriteriaBuilder cb = em.getCriteriaBuilder();

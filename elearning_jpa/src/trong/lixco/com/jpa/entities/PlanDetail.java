@@ -7,6 +7,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 import trong.lixco.com.jpa.entity.AbstractEntity;
 
@@ -24,6 +25,11 @@ public class PlanDetail extends AbstractEntity {
 	@Temporal(TemporalType.DATE)
 	private Date end_time;
 
+	@Transient
+	private boolean isRate = false;
+	@Transient
+	private String resultTemp;
+
 	public PlanDetail() {
 		super();
 	}
@@ -34,6 +40,14 @@ public class PlanDetail extends AbstractEntity {
 		this.plan = plan;
 		this.start_time = start_time;
 		this.end_time = end_time;
+	}
+
+	public String getResultTemp() {
+		return resultTemp;
+	}
+
+	public void setResultTemp(String resultTemp) {
+		this.resultTemp = resultTemp;
 	}
 
 	public Date getStart_time() {
@@ -75,4 +89,13 @@ public class PlanDetail extends AbstractEntity {
 	public void setPlan(Plan plan) {
 		this.plan = plan;
 	}
+
+	public boolean isRate() {
+		return isRate;
+	}
+
+	public void setRate(boolean isRate) {
+		this.isRate = isRate;
+	}
+
 }

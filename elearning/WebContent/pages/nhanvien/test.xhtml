@@ -67,6 +67,9 @@ div#formTest {
 						<h:outputText value="Câu #{index + 1}: " style="margin-left:25px" />
 						<h:outputText value="#{item.question.name_question}" />
 						<f:facet name="description">
+							<h:graphicImage rendered="#{item.question.image_name != null}" style="margin-top:5px;margin-bottom:20px"
+								value="/images/#{item.question.image_name}" width="500"
+								height="200" />
 							<p:selectOneRadio id="answer#{index + 1}"
 								value="#{testBean.answersResp[index + 1]}" layout="responsive"
 								columns="1" converter="abstractConverter">

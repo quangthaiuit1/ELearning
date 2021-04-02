@@ -110,28 +110,35 @@
 							</f:facet>
 							<p:ajax event="rowSelect"
 								listener="#{courseEmployeeBean.planDetailOnRowSelect()}" />
-							<p:column headerText="STT" style="width:10%;text-align:center">
+							<p:column headerText="STT" style="width:5%;text-align:center">
 								<h:outputText value="#{rowIndex+1}" />
 							</p:column>
 
-							<p:column headerText="Tên khóa học" style="width:30%">
+							<p:column headerText="Tên khóa học" style="width:55%">
 								<h:outputText value="#{item5.course.name}" />
 							</p:column>
 							<p:column headerText="Ngày bắt đầu"
-								style="width:20%;text-align:center">
+								style="width:10%;text-align:center">
 								<h:outputText value="#{item5.start_time}">
 									<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
 								</h:outputText>
 							</p:column>
 							<p:column headerText="Ngày kết thúc"
-								style="width:20%;text-align:center">
+								style="width:10%;text-align:center">
 								<h:outputText value="#{item5.end_time}">
 									<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
 								</h:outputText>
 							</p:column>
 							<p:column headerText="Điểm trung bình"
-								style="width:20%;text-align:center">
+								style="width:10%;text-align:center">
 								<h:outputText value="#{item5.avg_score}" />
+							</p:column>
+							<p:column headerText="..." style="text-align: center;width: 10%">
+								<p:linkButton ajax="false" outcome="danhgia"
+									disabled="#{!item5.rate}" value="Đánh giá" target="_blank"
+									style="width:90%;border-radius:3px;" styleClass="btsave">
+									<f:param name="course" value="#{item5.course.id}" />
+								</p:linkButton>
 							</p:column>
 							<f:facet name="footer">
 								<div style="clear: both;" />
@@ -185,10 +192,10 @@
 							</h:outputText>
 						</p:column>
 						<p:column headerText="..." style="text-align: center;width: 100px">
-							<p:linkButton ajax="false" outcome="chitietkhoahoc"
-								disabled="true" value="Xem chi tiết" target="_blank"
+							<p:linkButton ajax="false" outcome="demokhoahoc" disabled="false"
+								value="Xem chi tiết" target="_blank"
 								style="width:90%;border-radius:3px;" styleClass="btsave">
-								<f:param name="pdid" value="#{item1.id}" />
+								<f:param name="course" value="#{item1.id}" />
 							</p:linkButton>
 						</p:column>
 						<f:facet name="footer">

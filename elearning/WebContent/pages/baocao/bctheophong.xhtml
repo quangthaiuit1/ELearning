@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" xmlns:b="http://bootsfaces.net/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:h="http://java.sun.com/jsf/html" template="/pages/home.xhtml">
+
+	<ui:define name="content">
+		<style>
+.ui-dialog {
+	overflow: scroll !important;
+	max-height: 100% !important;
+}
+
+.sldapan label {
+	width: 90%;
+	margin-right: 0px !important;
+}
+
+.sldapan {
+	width: 100%;
+	margin: 0px;
+}
+
+.sldapan td {
+	padding: 0px;
+	text-align: left;
+}
+
+.lnumber {
+	background: #009688;
+	padding: 5px 10px;
+	color: white;
+	border-radius: 30px;
+	margin-right: 10px;
+}
+
+.lcauhoi {
+	font-size: 1.2em !important;
+	font-weight: bold;
+	color: #009688;
+}
+
+.diemdanhgia {
+	font-size: 1.1em !important;
+	text-decoration: underline !important;
+	color: #0e8bee !important;
+}
+
+.animated .ui-progressbar-value {
+	background-image: url("#{resource['images/pbar-ani.gif']}");
+}
+</style>
+		<script type="text/javascript">
+    //<![CDATA[
+    //]]>
+</script>
+		<p:growl id="growlPlan" showDetail="true" sticky="false" />
+		<p:tabView id="tv" widgetVar="myTab">
+			<p:tab title="Danh Sách">
+				<h:form id="list">
+					<p:panel
+						style="float:right; border:0px; margin-top:-65px !important;background:none;">
+						<h:panelGrid id="mainGrid" columns="6"
+							style="float:left; margin-bottom:5px">
+							<h:panelGrid columns="2" style="width:100%" cellspacing="10">
+								<p:outputLabel value="Năm" />
+								<p:spinner size="10" value="#{baoCaoTheoPhongBean.yearSearch}"
+									min="2020" max="2050">
+									<p:ajax process="@this" update="growlPlan,dtTablePlan"
+										listener="#{baoCaoTheoPhongBean.ajaxHandleChooseDepartment}" />
+								</p:spinner>
+							</h:panelGrid>
+							<h:panelGrid columns="2" style="width:100%" cellspacing="10">
+								<p:selectOneMenu
+									value="#{baoCaoTheoPhongBean.departmentSelected}"
+									converter="abstractConverter" effect="fade" var="t"
+									style="width:150px;" id="iddeps" filter="true"
+									filterMatchMode="custom" filterFunction="customFilter">
+									<p:ajax event="change" update="growlPlan,dtTablePlan"
+										listener="#{baoCaoTheoPhongBean.ajaxHandleChooseDepartment}" />
+									<f:selectItems value="#{baoCaoTheoPhongBean.departmentSearchs}"
+										var="item2" itemLabel="#{item2.name}" itemValue="#{item2}" />
+									<p:column>
+										<h:outputText value="#{t.code}" />
+									</p:column>
+									<p:column>
+										<h:outputText value="#{t.showAllNameDepart()}" escape="false" />
+									</p:column>
+								</p:selectOneMenu>
+							</h:panelGrid>
+							<p:commandButton value="Đồng bộ" style="float:right;"
+								styleClass="btnWarning" icon="fa fa-refresh"
+								update="dtTablePlan,growlPlan" process="@form"
+								oncomplete="PF('dtlistKeHoach').clearFilters()"
+								actionListener="#{baoCaoTheoPhongBean.syncPlan()}" />
+							<p:commandButton value="Tạo mới" styleClass="btadd"
+								style="float:right;" icon="ui-icon-plus"
+								update="dtTablePlan,growlPlan" process="@form"
+								oncomplete="PF('dtlistKeHoach').clearFilters()"
+								actionListener="#{baoCaoTheoPhongBean.create()}" />
+							<p:commandButton value="Tìm" styleClass="btsearch"
+								style="float:right;" icon="ui-icon-search" update="dtTablePlan"
+								process="@form" oncomplete="PF('dtlistKeHoach').clearFilters()"
+								actionListener="#{baoCaoTheoPhongBean.searchItem()}" />
+							<p:commandButton value="Xóa" styleClass="btnDelete" id="xoact"
+								oncomplete="PF('dtlistKeHoach').clearFilters()"
+								update=":messages,dtTablePlan"
+								action="#{baoCaoTheoPhongBean.delete()}">
+								<p:confirm header="Xác nhận"
+									message="Bạn có chắc muốn xoá không?" icon="ui-icon-alert" />
+							</p:commandButton>
+						</h:panelGrid>
+					</p:panel>
+					<div style="clear: both" />
+					<p:dataTable value="#{baoCaoTheoPhongBean.plansByDepart}"
+						widgetVar="dtlistKeHoach" styleClass="tableparent"
+						rowKey="#{item.id}"
+						filteredValue="#{baoCaoTheoPhongBean.plansFilter}"
+						selection="#{baoCaoTheoPhongBean.planSelected}"
+						selectionMode="single" id="dtTablePlan" var="item">
+						<p:ajax event="rowSelect" update="tv:tab2:dtDetailByPlan"
+							listener="#{baoCaoTheoPhongBean.tab1OnRowSelect()}" />
+						<p:column headerText="..." style="width:5%;text-align:center">
+							<p:selectBooleanCheckbox value="#{item.select}" itemLabel="">
+								<p:ajax process="@this" />
+							</p:selectBooleanCheckbox>
+						</p:column>
+						<p:column headerText="Năm" style="width:10%;text-align:center">
+							<h:outputText value="#{item.year}" />
+						</p:column>
+						<p:column headerText="Nhân viên" style="width:40%"
+							filterBy="#{item.employee_name}"
+							filterFunction="#{abstractCustomFilter.filterByText}">
+							<h:outputText value="#{item.employee_name}" />
+						</p:column>
+						<p:column headerText="Phòng ban" style="width:45%"
+							filterBy="#{item.department_name}"
+							filterFunction="#{abstractCustomFilter.filterByText}">
+							<h:outputText value="#{item.department_name}" />
+						</p:column>
+						<f:facet name="footer">
+							<div style="clear: both;" />
+						</f:facet>
+					</p:dataTable>
+				</h:form>
+			</p:tab>
+			<p:tab title="Khóa học đã đăng ký">
+				<h:form id="tab2">
+					<p:panel
+						style="float:right; border:0px; margin-top:-53px !important">
+						<p:commandButton style="width:130px;margin-left:18%"
+							styleClass="btnWarning" type="submit" value="Lưu/cập nhật"
+							process="@form" update="growlPlan,tab2"
+							action="#{baoCaoTheoPhongBean.saveOrUpdateTab3()}"
+							icon="fa fa-save" />
+					</p:panel>
+					<p:dataTable var="item1"
+						value="#{baoCaoTheoPhongBean.detailsByPlan}"
+						rowsPerPageTemplate="25,50,100" scrollable="true" paginator="true"
+						paginatorPosition="bottom" tyleClass="tableformat1"
+						scrollHeight="100%" rowKey="#{item1.id}" id="dtDetailByPlan"
+						style="width:100%;height:528px;margin-left:10px"
+						rowIndexVar="rowIndex"
+						selection="#{baoCaoTheoPhongBean.pdSelected}"
+						selectionMode="single">
+						<p:ajax event="rowSelect" update="tv:tab3:dtSkillByPlan"
+							listener="#{baoCaoTheoPhongBean.tab2OnRowSelect()}" />
+						<f:facet name="header">
+							<h:outputText value="Danh sách chi tiết khóa học đã đăng ký" />
+						</f:facet>
+						<p:column headerText="STT" style="width:10%;text-align:center">
+							<h:outputText value="#{rowIndex+1}" />
+						</p:column>
+
+						<p:column headerText="Tên khóa học" style="width:25%;">
+							<h:outputText value="#{item1.course.name}" />
+						</p:column>
+						<p:column headerText="Mô tả" style="width:45%; text-align:center">
+							<h:outputText value="#{item1.course.description}" />
+						</p:column>
+						<p:column headerText="Ngày bắt đầu" style="width:10%">
+							<p:calendar styleClass="stwidth" locale="vi"
+								value="#{item1.start_time}" id="startDate"
+								pattern="#{applicationBean.cf.formatDate}"
+								showButtonPanel="true" navigator="true"
+								mask="#{applicationBean.cf.maskDate}">
+								<p:ajax event="dateSelect"
+									listener="#{baoCaoTheoPhongBean.ajaxHandleEndDate(item1)}"
+									update="dtDetailByPlan" />
+							</p:calendar>
+						</p:column>
+						<p:column headerText="Ngày kết thúc" style="width:10%">
+							<h:outputText value="#{item1.end_time}">
+								<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
+							</h:outputText>
+						</p:column>
+						<f:facet name="footer">
+							<div style="clear: both;" />
+						</f:facet>
+					</p:dataTable>
+				</h:form>
+			</p:tab>
+			<p:tab title="Chi tiết khóa học">
+				<h:form id="tab3">
+					<p:dataTable value="#{baoCaoTheoPhongBean.planDetailSkillsByEmpl}"
+						rowsPerPageTemplate="25,50,100" scrollable="true" paginator="true"
+						paginatorPosition="bottom" tyleClass="tableformat1"
+						scrollHeight="100%" rowKey="#{item3.id}" id="dtSkillByPlan"
+						style="width:100%;height:528px;margin-left:10px"
+						rowIndexVar="rowIndex" var="item3">
+						<f:facet name="header">
+							<h:outputText value="Chi tiết khóa học đã đăng ký" />
+						</f:facet>
+						<p:column headerText="STT" style="width:10%;text-align:center">
+							<h:outputText value="#{rowIndex+1}" />
+						</p:column>
+
+						<p:column headerText="Tên khóa học" style="width:35%;">
+							<h:outputText value="#{item3.skill.name}" />
+						</p:column>
+						<p:column headerText="Điểm" style="width:25%;text-align:center">
+							<h:outputText value="#{item3.score_tracnghiem}" />
+						</p:column>
+						<p:column headerText="Đã thực hiện" style="width:15%">
+							<p:panelGrid styleClass="showcase-text-align-center"
+								rendered="#{item3.success}">
+								<i style="margin-left: 12px" class="fa fa-fw fa-check-square-o"></i>
+							</p:panelGrid>
+						</p:column>
+						<p:column headerText="Đã hết hạn" style="width:15%">
+							<p:panelGrid styleClass="showcase-text-align-center"
+								rendered="#{item3.expired}">
+								<i style="margin-left: 12px; color: red"
+									class="fa fa-fw fa-check-square-o"></i>
+							</p:panelGrid>
+						</p:column>
+						<f:facet name="footer">
+							<div style="clear: both;" />
+						</f:facet>
+					</p:dataTable>
+				</h:form>
+			</p:tab>
+		</p:tabView>
+		<br />
+	</ui:define>
+</ui:composition>

@@ -44,7 +44,7 @@ import trong.lixco.com.util.DepartmentUtil;
 
 @Named
 @ViewScoped
-public class CoursePlanBean extends AbstractBean<Course> {
+public class BaoCaoTheoPhongBean extends AbstractBean<Course> {
 	private static final long serialVersionUID = 1L;
 	private int yearSearch = 0;
 	private Department departmentSelected;
@@ -53,12 +53,15 @@ public class CoursePlanBean extends AbstractBean<Course> {
 	private List<Plan> plansFilter;
 	private Plan planSelected;
 	private Member member;
-	private PositionJobData[] positionsByEmpl;
-	private List<PositionJobData> positionsByEmplList;
-	private PositionJobData positionSelected;
-	private List<Course> coursesByPosition;
-	private List<Course> coursesOption;
+	// private PositionJobData[] positionsByEmpl;
+	// private List<PositionJobData> positionsByEmplList;
+	// private PositionJobData positionSelected;
+	// private List<Course> coursesByPosition;
+	// private List<Course> coursesOption;
 	private List<PlanDetail> detailsByPlan;
+
+	private List<PlanDetailSkill> planDetailSkillsByEmpl;
+	private PlanDetail pdSelected;
 
 	DepartmentServicePublic departmentServicePublic;
 	MemberServicePublic memberServicePublic;
@@ -90,10 +93,25 @@ public class CoursePlanBean extends AbstractBean<Course> {
 			departmentSearchs = new ArrayList<Department>();
 			// if (getAccount().isAdmin()) {
 			Department[] deps = departmentServicePublic.findAll();
-			for (int i = 0; i < deps.length; i++) {
-				if (deps[i].getLevelDep() != null)
-					if (deps[i].getLevelDep().getLevel() > 1)
-						departmentSearchs.add(deps[i]);
+			// for (int i = 0; i < deps.length; i++) {
+			// if (deps[i].getLevelDep() != null)
+			// if (deps[i].getLevelDep().getLevel() > 1)
+			// departmentSearchs.add(deps[i]);
+			// }
+
+			if (getAccount().isAdmin()) {
+				// Department dFirst = new Department();
+				// dFirst.setName("--Tất cả phòng ban--");
+				// departments.add(dFirst);
+				for (int i = 0; i < deps.length; i++) {
+					if (deps[i].getLevelDep() != null) {
+						if (deps[i].getLevelDep().getLevel() >= 2) {
+							departmentSearchs.add(deps[i]);
+						}
+					}
+				}
+			} else {
+				departmentSearchs.add(member.getDepartment().getDepartment());
 			}
 
 			// } else {
@@ -103,9 +121,14 @@ public class CoursePlanBean extends AbstractBean<Course> {
 				departmentSearchs = DepartmentUtil.sort(departmentSearchs);
 				departmentSelected = departmentSearchs.get(0);
 			}
+			planDetailSkillsByEmpl = new ArrayList<>();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void ajaxHandleChooseDepartment() {
+		plansByDepart = PLAN_SERVICE.findByDepartAndYear(departmentSelected.getCode(), yearSearch);
 	}
 
 	public void ajaxHandleEndDate(PlanDetail item) {
@@ -124,39 +147,47 @@ public class CoursePlanBean extends AbstractBean<Course> {
 		}
 	}
 
-	public void planShowEdit() {
-		// tim vi tri chuc danh theo nhan vien duoc chon
-		positionsByEmpl = PositionJobDataService.vttheonhanvien(planSelected.getEmployee_code());
-		positionsByEmplList = Arrays.asList(positionsByEmpl);
-		// query danh sach chi tiet ke hoach
-		detailsByPlan = PLAN_DETAIL_SERVICE.findByPlan(planSelected.getId());
-		positionSelected = new PositionJobData();
-		coursesByPosition = new ArrayList<>();
+	public void planShowEdit(Plan itemTemp) {
+		// // tim vi tri chuc danh theo nhan vien duoc chon
+		// positionsByEmpl =
+		// PositionJobDataService.vttheonhanvien(planSelected.getEmployee_code());
+		// positionsByEmplList = Arrays.asList(positionsByEmpl);
+		// // query danh sach chi tiet ke hoach
+		// detailsByPlan = PLAN_DETAIL_SERVICE.findByPlan(planSelected.getId());
+		// positionSelected = new PositionJobData();
+		// coursesByPosition = new ArrayList<>();
+		//
+		// // tim khoa hoc tu chon
+		// coursesOption = COURSE_SERVICE.findByCourseType(5);
 
-		// tim khoa hoc tu chon
-		coursesOption = COURSE_SERVICE.findByCourseType(5);
+		// planDetailSkillsByEmpl =
+		// PLAN_DETAIL_SKILL_SERVICE.findByCourseAndPlan(item.getId());
+		detailsByPlan = PLAN_DETAIL_SERVICE.findByPlan(itemTemp.getId());
+		if (detailsByPlan.isEmpty()) {
+			detailsByPlan = new ArrayList<>();
+		}
+	}
+
+	public void tab1OnRowSelect() {
+		if (planSelected != null && planSelected.getId() != null) {
+			detailsByPlan = PLAN_DETAIL_SERVICE.findByPlan(planSelected.getId());
+			if (detailsByPlan.isEmpty()) {
+				detailsByPlan = new ArrayList<>();
+			}
+		}
+	}
+
+	public void tab2OnRowSelect() {
+		if (pdSelected != null && pdSelected.getId() != null) {
+			planDetailSkillsByEmpl = PLAN_DETAIL_SKILL_SERVICE.findBySkillAndPlanDetail(0, pdSelected.getId());
+			if (planDetailSkillsByEmpl.isEmpty()) {
+				planDetailSkillsByEmpl = new ArrayList<>();
+			}
+		}
 	}
 
 	public void searchItem() {
 		plansByDepart = PLAN_SERVICE.findByDepartAndYear(departmentSelected.getCode(), yearSearch);
-	}
-
-	// tim danh sach khoa hoc theo vi tri
-	public void positionOnRowSelect() {
-		List<CoursePositionJob> coursePosi = COURSE_POSITION_JOB_SERVICE.findByPosition(positionSelected.getCode());
-		List<Long> ids = new ArrayList<>();
-		for (CoursePositionJob c : coursePosi) {
-			ids.add(c.getCourse().getId());
-		}
-		coursesByPosition = COURSE_SERVICE.findByListId(ids);
-		// tim khoa hoc nao da co thi set select = true
-		for (int i = 0; i < coursesByPosition.size(); i++) {
-			PlanDetail p = PLAN_DETAIL_SERVICE.findByCourseAndPlan(coursesByPosition.get(i).getId(),
-					planSelected.getId());
-			if (p != null && p.getId() != null) {
-				coursesByPosition.get(i).setSelect(true);
-			}
-		}
 	}
 
 	public void saveOrUpdateTab3() {
@@ -350,9 +381,6 @@ public class CoursePlanBean extends AbstractBean<Course> {
 								PlanDetail pdnewTemp = new PlanDetail();
 								pdnewTemp.setCourse(cps.get(k).getCourse());
 								pdnewTemp.setPlan(allPlanByYear.get(i));
-								pdnewTemp.setStart_time(new Date());
-								pdnewTemp.setEnd_time(
-										DateUtil.addDays(pdnewTemp.getStart_time(), pdnewTemp.getCourse().getTime()));
 								pdnewTemp.setCreatedDate(new Date());
 								pdnewTemp.setCreatedUser(member.getCode());
 								// kiem tra xem plan detail da duoc tao chua
@@ -412,42 +440,44 @@ public class CoursePlanBean extends AbstractBean<Course> {
 	}
 
 	public void saveOrUpdate() {
-		for (int i = 0; i < coursesByPosition.size(); i++) {
-			if (coursesByPosition.get(i).isSelect()) {
-				PlanDetail pdNew = new PlanDetail();
-				pdNew.setPlan(planSelected);
-				pdNew.setCourse(coursesByPosition.get(i));
-				try {
-					// kiem tra khoa hoc da ton tai chua
-					PlanDetail pdCheck = PLAN_DETAIL_SERVICE.findByCourseAndPlan(coursesByPosition.get(i).getId(),
-							planSelected.getId());
-					if (pdCheck.getId() == null) {
-						PlanDetail p = PLAN_DETAIL_SERVICE.create(pdNew);
-						// neu them chi tiet khoa hoc thanh cong -> them ki nang
-						List<Skill> s = SKILL_SERVICE.findByCourse(p.getCourse().getId());
-						for (int j = 0; j < s.size(); j++) {
-							PlanDetailSkill pds = new PlanDetailSkill(s.get(j), p);
-							pds = PLAN_DETAIL_SKILL_SERVICE.create(pds);
-						}
-					} else {
-						List<Skill> s = SKILL_SERVICE.findByCourse(pdCheck.getCourse().getId());
-						for (int j = 0; j < s.size(); j++) {
-							PlanDetailSkill pds = new PlanDetailSkill(s.get(j), pdCheck);
-							// kiem tra co chua
-							List<PlanDetailSkill> listCheck = PLAN_DETAIL_SKILL_SERVICE
-									.findBySkillAndPlanDetail(s.get(j).getId(), pdCheck.getId());
-							if (listCheck.isEmpty()) {
-								pds = PLAN_DETAIL_SKILL_SERVICE.create(pds);
-							}
-						}
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-					MessageView.ERROR("Lỗi");
-					return;
-				}
-			}
-		}
+		// for (int i = 0; i < coursesByPosition.size(); i++) {
+		// if (coursesByPosition.get(i).isSelect()) {
+		// PlanDetail pdNew = new PlanDetail();
+		// pdNew.setPlan(planSelected);
+		// pdNew.setCourse(coursesByPosition.get(i));
+		// try {
+		// // kiem tra khoa hoc da ton tai chua
+		// PlanDetail pdCheck =
+		// PLAN_DETAIL_SERVICE.findByCourseAndPlan(coursesByPosition.get(i).getId(),
+		// planSelected.getId());
+		// if (pdCheck.getId() == null) {
+		// PlanDetail p = PLAN_DETAIL_SERVICE.create(pdNew);
+		// // neu them chi tiet khoa hoc thanh cong -> them ki nang
+		// List<Skill> s = SKILL_SERVICE.findByCourse(p.getCourse().getId());
+		// for (int j = 0; j < s.size(); j++) {
+		// PlanDetailSkill pds = new PlanDetailSkill(s.get(j), p);
+		// pds = PLAN_DETAIL_SKILL_SERVICE.create(pds);
+		// }
+		// } else {
+		// List<Skill> s =
+		// SKILL_SERVICE.findByCourse(pdCheck.getCourse().getId());
+		// for (int j = 0; j < s.size(); j++) {
+		// PlanDetailSkill pds = new PlanDetailSkill(s.get(j), pdCheck);
+		// // kiem tra co chua
+		// List<PlanDetailSkill> listCheck = PLAN_DETAIL_SKILL_SERVICE
+		// .findBySkillAndPlanDetail(s.get(j).getId(), pdCheck.getId());
+		// if (listCheck.isEmpty()) {
+		// pds = PLAN_DETAIL_SKILL_SERVICE.create(pds);
+		// }
+		// }
+		// }
+		// } catch (Exception e) {
+		// e.printStackTrace();
+		// MessageView.ERROR("Lỗi");
+		// return;
+		// }
+		// }
+		// }
 		detailsByPlan = PLAN_DETAIL_SERVICE.findByPlan(planSelected.getId());
 		MessageView.INFO("Thành công");
 	}
@@ -505,30 +535,6 @@ public class CoursePlanBean extends AbstractBean<Course> {
 		this.planSelected = planSelected;
 	}
 
-	public List<PositionJobData> getPositionsByEmplList() {
-		return positionsByEmplList;
-	}
-
-	public void setPositionsByEmplList(List<PositionJobData> positionsByEmplList) {
-		this.positionsByEmplList = positionsByEmplList;
-	}
-
-	public PositionJobData getPositionSelected() {
-		return positionSelected;
-	}
-
-	public void setPositionSelected(PositionJobData positionSelected) {
-		this.positionSelected = positionSelected;
-	}
-
-	public List<Course> getCoursesByPosition() {
-		return coursesByPosition;
-	}
-
-	public void setCoursesByPosition(List<Course> coursesByPosition) {
-		this.coursesByPosition = coursesByPosition;
-	}
-
 	public Member getMember() {
 		return member;
 	}
@@ -545,11 +551,19 @@ public class CoursePlanBean extends AbstractBean<Course> {
 		this.detailsByPlan = detailsByPlan;
 	}
 
-	public List<Course> getCoursesOption() {
-		return coursesOption;
+	public List<PlanDetailSkill> getPlanDetailSkillsByEmpl() {
+		return planDetailSkillsByEmpl;
 	}
 
-	public void setCoursesOption(List<Course> coursesOption) {
-		this.coursesOption = coursesOption;
+	public void setPlanDetailSkillsByEmpl(List<PlanDetailSkill> planDetailSkillsByEmpl) {
+		this.planDetailSkillsByEmpl = planDetailSkillsByEmpl;
+	}
+
+	public PlanDetail getPdSelected() {
+		return pdSelected;
+	}
+
+	public void setPdSelected(PlanDetail pdSelected) {
+		this.pdSelected = pdSelected;
 	}
 }

@@ -12,10 +12,12 @@ import static java.nio.file.StandardOpenOption.READ;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+@WebServlet("/video/*")
 public final class StreamingVideoServlet extends HttpServlet {
 	private static final long serialVersionUID = 1451083586988759598L;
 	private static final int BUFFER_LENGTH = 1024 * 16;
@@ -25,7 +27,7 @@ public final class StreamingVideoServlet extends HttpServlet {
 
 	@Override
 	public void init() throws ServletException {
-		videoPath = "D:\\";
+		videoPath = "D:/STORAGE-ELEARNING/VIDEO/";
 	}
 
 	@Override
